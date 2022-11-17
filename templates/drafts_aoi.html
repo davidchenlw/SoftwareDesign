@@ -1,0 +1,56 @@
+{% include 'header.html' %}
+
+<body>
+    {% include 'navbar.html' %} {% include 'sidebar.html' %}
+    <div class="container" style="padding-left: 150px;">
+        <div class="row">
+            <h1 id="logo_content" class="page-header">
+                <img id="logo" src="../static/images/logo.png">
+            </h1>
+            <div class="poi_show col-lg-12">
+                <h2 id="aoiDraftsTitle" style="display: inline">我的景區暫存列表</h2>
+                <br>
+
+                {% for aoi in list %}
+                    <table class="table table-hover">
+                    <tr>
+                        <th>
+                            <a href="/loi_detail/{{aoi.aoi_id}}">{{aoi.title}}</a>
+                            
+                            
+                            {% if aoi.open %}
+                            <p style="color:#00F; display:inline;" class="public-2">
+                                公開
+                            </p>
+                             {% else %}
+                            <p style="color:#F00; display:inline;" class="private">
+                                不公開
+                            </p>
+                            {% endif %} 
+
+                            <button class="btn btn-danger" onclick="deleteAOI('{{aoi.aoi_id}}')" style="float: right; margin-right: 10px;">刪除</button>
+                            <button class="btn btn-warning" onclick="finishAOI('{{aoi.aoi_id}}')" style="float: right; margin-right: 10px;">完成</button>
+                            <button class="btn btn-info" onclick="editAOI('{{aoi.aoi_id}}')" style="float: right; margin-right: 10px;">修改</button>
+                        </th>
+                    </tr>
+                {% endfor %}
+            </div>
+        
+        </div>
+    </div>
+
+
+    <div id="loading" hidden>
+        <img src="../static/images/loading.gif" style="position: fixed; display: block; top:40%; right: 50%;">
+    </div>
+    
+
+    {% load static %}
+    <script src="{% static 'js/drafts_aoi.js' %}"></script>
+    <script src="{% static 'js/huge_import_poi.js' %}"></script>
+    <script type="text/javascript">
+        is_edit = false;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,683 @@
+{% include 'header.html' %}
+
+
+<style>
+    table {
+        z-index: 0;
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+        border-collapse: separate;
+        border: 0px
+    }
+    
+    td,
+    th {
+      padding: 0.25em;
+    }
+    
+    thead th {
+        text-align: center;
+        vertical-align: middle;
+        position: -webkit-sticky; /* for Safari */
+        position: sticky;
+        top: 0;
+        background-color: #C1FFE4; color: #003D79;
+        border: 0px;
+        border-right: 1px solid #003D79;
+        border-bottom: 1px solid #003D79;
+    }
+    
+    thead th:first-child {
+        left: 0;
+        z-index: 1;
+    }
+    
+    tbody th {
+        position: -webkit-sticky; /* for Safari */
+        position: sticky;
+        left: 0;
+        background: #FFF;
+        border: 0px;
+    }
+
+    tbody td {
+        border: 0px;
+    }
+    
+</style>
+
+<body>
+    {% include 'navbar.html' %} {% include 'sidebar.html' %}
+    {% load index %}
+    <div class="container">
+        <div class="row">
+            <hr>
+            <ul id="choose_web" class="nav nav-tabs">
+                <li class="active">
+                    <a id="choose_deh" href="#deh" data-toggle="tab">文史脈流</a>
+                </li>
+                <li>
+                    <a id="choose_extn" href="#extn" data-toggle="tab">校本課程</a>
+                </li>
+                <li>
+                    <a id="choose_sdc" href="#sdc" data-toggle="tab">踏溯台南</a>
+                </li>
+            </ul>
+        </div>
+        <br>
+        <!--第二排Tab-->
+        <div class="tab-content">
+            <div id="deh" class="tab-pane fade in active">
+                <div class="row">
+                    <ul id="choose_identity" class="nav nav-tabs">
+                        <li class="active">
+                            <a id="chooss_all" href="#all_statics" data-toggle="tab">總和統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_professer" href="#professer_statics" data-toggle="tab">專家統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_player" href="#player_statics" data-toggle="tab">玩家統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_guild" href="#guild_statics" data-toggle="tab">解說員統計表</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--顯示表格 P.S. style沒拉出去因為我懶-->
+                <div class="tab-content">
+                    <!--全部統計表-->
+                    <br>
+                    <div id="all_statics" class="tab-pane fade in active" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{all_statical_deh|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--專家統計表-->
+                    <div id="professer_statics" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{expert_statical_deh|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--玩家統計表-->
+                    <div id="player_statics" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{player_statical_deh|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--解說員統計表-->
+                    <div id="guild_statics" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{docent_statical_deh|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="extn" class="tab-pane fade">
+                <div class="row">
+                    <ul id="choose_identity" class="nav nav-tabs">
+                        <li class="active">
+                            <a id="chooss_all" href="#all_statics_extn" data-toggle="tab">總和統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_professer" href="#professer_statics_extn" data-toggle="tab">專家統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_player" href="#player_statics_extn" data-toggle="tab">玩家統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_guild" href="#guild_statics_extn" data-toggle="tab">解說員統計表</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--顯示表格 P.S. style沒拉出去因為我懶-->
+                <div class="tab-content">
+                    <!--全部統計表-->
+                    <br>
+                    <div id="all_statics_extn" class="tab-pane fade in active" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{all_statical_extn|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--專家統計表-->
+                    <div id="professer_statics_extn" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{expert_statical_extn|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--玩家統計表-->
+                    <div id="player_statics_extn" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{player_statical_extn|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--解說員統計表-->
+                    <div id="guild_statics_extn" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{docent_statical_extn|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sdc" class="tab-pane fade">
+                <div class="row">
+                    <ul id="choose_identity" class="nav nav-tabs">
+                        <li class="active">
+                            <a id="chooss_all" href="#all_statics_sdc" data-toggle="tab">總和統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_professer" href="#professer_statics_sdc" data-toggle="tab">專家統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_player" href="#player_statics_sdc" data-toggle="tab">玩家統計表</a>
+                        </li>
+                        <li>
+                            <a id="chooss_guild" href="#guild_statics_sdc" data-toggle="tab">解說員統計表</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--顯示表格 P.S. style沒拉出去因為我懶-->
+                <div class="tab-content">
+                    <!--全部統計表-->
+                    <br>
+                    <div id="all_statics_sdc" class="tab-pane fade in active" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{all_statical_sdc|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--專家統計表-->
+                    <div id="professer_statics_sdc" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{expert_statical_sdc|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--玩家統計表-->
+                    <div id="player_statics_sdc" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{player_statical_sdc|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--解說員統計表-->
+                    <div id="guild_statics_sdc" class="tab-pane fade" style="overflow:auto; height: 75vh;">
+                        <table width="2100px">
+                            <colgroup>
+                                <col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                                <col width="100px"><col width="100px"><col width="100px"><col width="100px"><col width="100px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th  style="border-top: 1px solid #003D79; border-left: 1px solid #003D79;"></th>
+                                    {% for XTagFirstLine in X_tag_1st %}
+                                        <th colspan="5" style="border-top: 1px solid #003D79;">
+                                            {{XTagFirstLine}}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th style="top: 31px; border-left: 1px solid #003D79;"></th>
+                                    {% for i in '0123'|make_list %}
+                                        {% for XTagSecondLine in X_tag_2ed %}
+                                            <th style="top: 31px;">
+                                                {{XTagSecondLine}}
+                                            </th>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in index24 %}
+                                            <tr>
+                                                <th scope="row" style="background-color: #C1FFE4; color: #003D79; text-align: center; vertical-align: middle; word-break: keep-all;white-space:nowrap; padding: 8px; border-left: 1px solid #003D79; border-bottom: 1px solid #003D79; border-right: 1px solid #003D79;">{{Y_tag|index:i}}</th>
+                                                {% for j in index20 %}
+                                                    <td colspan="1" style="text-align: center; vertical-align: middle; padding: 8px; border-bottom: 1px solid #3883ce; border-right: 1px solid #3883ce;">{{docent_statical_sdc|index:i|index:j}}</td>
+                                                {% endfor %}
+                                            </tr>
+                                {% endfor%}
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<input type="hidden" id="search_user" value="{{username}}">
+
+<script>
+    is_edit = false;
+    const COI_NAME = '';
+    const COI_URL = '/';
+    $(document).ready(function () {
+        if ($(window).width() < 1025) {
+            $("#web_search_result").css("margin-left", "0");
+            $("#mobile_search_result").css("margin-left", "0");
+            $("#web-history-map").css("width", "100%");
+            $("#mobile-history-map").css("width", "100%");
+        }
+    });
+
+    const element = document.getElementById("div1");
+    element.appendChild(para);
+
+
+    
+</script> {% load static %}
+<script src="{% static 'js/my_history.js' %}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqPYQN7x5wDi_hOIoS0DiOHSC4i66IcDY&callback=initMap"></script>
+</html>

@@ -1,0 +1,197 @@
+<nav id="mySidenav" class="sidenav easy-sidebar-active">
+	<div class="copen">
+	
+	</div>
+	<a id="sidenav-toggle"></a>
+
+	<ul>
+		<li>
+			<a   id="myall" onclick="toPOIList()" style="cursor: pointer;">我的景點/景線/景區/主題故事</a>
+		</li>
+		<li>
+			<a href="/list_groups" id="mygroup">群組管理</a>
+		</li>
+		<li>
+			
+			<a style="display: inline-block;" href="/make_player_poi" id="createPOI" >製作景點 </a>
+			<button id="poiDrafts" style="font-size:small;float:right;padding: 0px;margin-top:10px;display: none;" class="btn btn-primary">暫存區</button>
+		</li>
+		<li>
+			<a  style=" display: inline-block;" href="/make_player_loi" id="createLOI">製作景線</a>
+			<button id="loiDrafts"  style="font-size:small;float:right;padding: 0px;margin-top:10px;display: none;" class="btn btn-primary">暫存區</button>
+		</li>
+		<li>
+			<a  style=" display: inline-block;" href="/make_player_aoi" id="createAOI">製作景區</a>
+			<button id="aoiDrafts"  style="font-size:small;float:right;padding: 0px;margin-top:10px;display: none;" class="btn btn-primary">暫存區</button>
+		</li>
+		<li>
+			<a  style=" display: inline-block;" href="/make_player_soi" id="createSOI">製作主題故事</a>
+			<button id="soiDrafts"  style="font-size:small;float:right;padding: 0px;margin-top:10px;display: none;" class="btn btn-primary">暫存區</button>
+		</li>
+		<li>
+			<a href="/make_group" id="createGroup">建立群組</a>
+		</li>
+		<li>
+			<a href="/my_history" id="historyIntro">歷史記錄</a>
+		</li>
+		<div id="list_events">
+			<li>
+            	<a href="/list_events" style="display: inline-block;">文資學堂</a>
+				<button id="eventDrafts"  style="font-size:small;float:right;padding: 0px;margin-top:10px; display: none;" class="btn btn-primary">暫存區</button>
+        	</li>
+		</div>
+		{% if user.is_prizeadder == 1%}
+		<li>
+			<a href="/list_prize">獎項登錄</a>
+		</li>
+		{% endif %}
+		<!-- <li>
+			<a href='/prize_exchange'>獎品派發</a>
+		</li> -->
+		<li>
+			<a href="/my_prize">我的獎品</a>
+		</li>
+		<li>
+			<a href="/statistical">統計表</a>
+		</li>
+        
+	</ul>
+</nav>
+<img id='arrow' src="/static/images/next.png" style="height: 50px;width: 50px;" display="none">
+
+
+
+<style>
+	@media screen and (max-width: 1500px) {
+		#mySidenav {
+			position: fixed;
+			padding-top: 0px;
+			padding-bottom: 50px;
+			margin-top: 47px;
+			width: auto;
+		}
+		#mySidenav>ul {
+			display: none;
+		}
+		#sidenav-toggle {
+			display: block;
+		}
+		#mySidenav:hover>ul {
+        display: block;
+        margin-top: 10px;
+    }
+	}
+	#arrow{
+        width: 30px;
+        height: 30px;
+        position: fixed;
+        top: 30%;
+        cursor: pointer;
+        z-index: 2147483647;
+    }
+</style>
+
+<script>
+
+	$(document).ready(function () {
+
+		$.ajax({
+        method: "GET",
+        url: "/draft_status",
+        success: function(data) {
+			var tmpMap = JSON.parse(data)
+			if(!tmpMap["poi"]){
+				$("#poiDrafts").hide()
+			}else{
+				$("#poiDrafts").show()
+			}
+			if(!tmpMap["loi"]){
+				$("#loiDrafts").hide()
+			}else{
+				$("#loiDrafts").show()
+			}
+			if(!tmpMap["aoi"]){
+				$("#aoiDrafts").hide()
+			}else{
+				$("#aoiDrafts").show()
+			}
+			if(!tmpMap["soi"]){
+				$("#soiDrafts").hide()
+			}else{
+				$("#soiDrafts").show()
+			}
+
+			if(!tmpMap["game"]){
+				$("#eventDrafts").hide()
+			}else{
+				$("#eventDrafts").show()
+			}
+        },
+        error: function(data) {
+            console.log(data);
+        },
+    });
+
+	 
+		if ($(window).width() < 1600) {
+			$('#mySidenav').hide();
+			$('#arrow').show();
+		} else {
+			$('#mySidenav').show();
+			$('#arrow').hide();
+		}
+
+
+		$(window).resize(function () {
+			if ($(window).width() < 1600) {
+				$('#mySidenav').hide();
+				$('#arrow').show();
+			}
+			else {
+				$('#mySidenav').show();
+				$('#arrow').hide();
+			}
+		});
+
+		if ($(window).width() < 1600) {
+			$('#mySidenav').hide();
+			$('#arrow').show();
+		}
+
+	});
+ 
+
+	$('#poiDrafts').click(function () {
+    	location.href = "/poi_drafts";
+	});
+
+	$('#loiDrafts').click(function () {
+    	location.href = "/loi_drafts";
+	});
+
+	$('#aoiDrafts').click(function () {
+    	location.href = "/aoi_drafts";
+	});
+
+	$('#soiDrafts').click(function () {
+    	location.href = "/soi_drafts";
+	});
+
+	$('#eventDrafts').click(function () {
+    	location.href = "/event_room_drafts";
+	});
+
+	$('#arrow').click(function () {
+		if ($("#mySidenav").css("display") == "none"){
+			$('#mySidenav ul').css('display', 'block');
+			$('#mySidenav').show();
+			
+
+		}else if ($("#mySidenav").css("display") == "block") {
+			$('#mySidenav').css('display', 'none');
+			// $('.container').click(function () {
+			// 	$('#mySidenav').hide();
+			// });
+		}
+	});
+</script>

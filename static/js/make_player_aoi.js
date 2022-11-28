@@ -5,7 +5,35 @@ role = $('#identifier').val();
 var is_edit = false;
 var area_list = []; //keep tracking of area user has choosen
 var map_markers = new Array();
-var map2;
+
+
+//Create a Here Map
+// Create a Platform object:
+var platform = new H.service.Platform({
+    'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
+});
+
+// Get an object containing the default map layers:
+var defaultLayers = platform.createDefaultLayers({lg:'cht'});
+
+// Instantiate the map using the vecor map with the
+// default style as the base layer:
+var map2 = new H.Map(
+    document.getElementById('map_aoi'),
+    defaultLayers.raster.normal.map, {
+        zoom: 7,
+        center: { lat: 23.5, lng: 121.120850 }
+    });
+
+// Enable the event system on the map instance:
+var mapEvents = new H.mapevents.MapEvents(map2);
+
+
+// Instantiate the default behavior, providing the mapEvents object: 
+var behavior = new H.mapevents.Behavior(mapEvents);
+
+// Create the default UI:
+var ui = H.ui.UI.createDefault(map2, defaultLayers, 'zh-CN')
 
 $(window).on('beforeunload', function() {
     localStorage.setItem('aoi_title', $('#aoi_title').val());
@@ -79,9 +107,7 @@ function Choosen_aoi(i) {
         if (can_choose) {
             area_list.push($('#areas').val());
             var temp_name="valid_or_not"+i;
-            // alert("temp_name : "+temp_name);
             var valid_or_not = document.getElementById(temp_name).value;
-            // alert(temp_name+" : "+valid_or_not);
             var str_valid_or_not="";
             switch(valid_or_not) {
                 case'0':
@@ -98,9 +124,7 @@ function Choosen_aoi(i) {
                     str_valid_or_not="已驗證通過";
             }
             var temp_name="open_or_not"+i;
-            // alert("temp_name : "+temp_name);
             var open_or_not = document.getElementById(temp_name).value;
-            // alert(temp_name+" : "+open_or_not);
             var str_open_or_not="";
             switch(open_or_not) {
                 case'true':
@@ -115,16 +139,14 @@ function Choosen_aoi(i) {
             }
             $('#items-list').append(
                 '<li id="choosen_title' + i + '" class="test" style="list-style-image: none;margin: 10px;border: 1px solid #ccc;padding: 4px;border-radius: 4px;color: #666;cursor: move;user-select: none; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none;" onclick="removePoi(' + i + ')" value="' + i + '"></li>'
-                // '<div id="list' + i + '" onclick="removePoi(' + i + ')" value="'+ i + '"> \
-                // <p style="display:inline;" id="choosen_id' + i + '">' + (aoi_num + 1) + ':</p>\
-                // <p style="margin-botton:0px; font-size:15px;display:inline; color:#00F;" id="choosen_title' + i + '"></p>\
-                // <input id="pid' + aoi_num + '" type="hidden"  value="' + i + '"/><br></div>'
+
             );
             $('#choosen_title' + i).html($('#choose_aoi' + i).text()+"("+str_valid_or_not+"/"+str_open_or_not+")"+"<input name=\"pid\" id=\"pid" + aoi_num + "\" type=\"hidden\"  value=\"" + i + "\"/><p hidden name=\"choose_order\" class=\"choose_order\" id=\"choosen_id" + i + "\">"+ (aoi_num + 1) + "</p><input type=\"hidden\" name=\"final_valid_or_not\"  value=\"" + valid_or_not + "\"><p hidden name=\"mylist_order\"  id=\"mylist_order" + i + "\">" + (aoi_num + 1) + "</p>");
-            // $('#choosen_title' + i).text($('#choose_aoi' + i).text());
+
             var latlng = $('input[name = "poi' + i + '"]').val().split(",");
             var location = {lat:Number(latlng[0]) , lng:Number(latlng[1])};
-            addMapMaker(aoi_num + 1 , location,$('#choose_aoi' + i).text());
+            addMapMarker(i , location,$('#choose_aoi' + i).text());
+
             aoi_num++;
             //Group the items(li) in list(ul)
             items = document.querySelectorAll('.test');
@@ -150,7 +172,7 @@ function dropped (e) {
   let target = $(e.target)
   let newIndex = target.index()
      
-    //clearMap();
+
     if(oldIndex < newIndex){
         var temp = new Array();
         for(var i=0;i<aoi_num;i++){
@@ -184,20 +206,20 @@ function dropped (e) {
         }
     }
 
-  if (newIndex == oldIndex) //避免原地移動造成意外刪除
-    return
-  let dropped = $(this).parent().children().eq(oldIndex).remove()
+    if (newIndex == oldIndex) //避免原地移動造成意外刪除
+        return
+    let dropped = $(this).parent().children().eq(oldIndex).remove()
 
-  // insert the dropped items at new place
-  if (newIndex < oldIndex) {
-    target.before(dropped)
-  } else {
-    target.after(dropped)
-  }
-  var mylist_order_Arr = document.getElementsByName('mylist_order');
-  for(var i=0; i<mylist_order_Arr.length; i++){
-      mylist_order_Arr[i].innerHTML = i+1;
-  }
+    // insert the dropped items at new place
+    if (newIndex < oldIndex) {
+        target.before(dropped)
+    } else {
+        target.after(dropped)
+    }
+    var mylist_order_Arr = document.getElementsByName('mylist_order');
+    for(var i=0; i<mylist_order_Arr.length; i++){
+        mylist_order_Arr[i].innerHTML = i+1;
+    }
 }
 
 function cancelDefault (e) {
@@ -206,14 +228,6 @@ function cancelDefault (e) {
   return false
 }
 
-// function Refresh() {
-//     var del = confirm('確定重選?');
-//     if (del) {
-//         $('#aoi_list').empty();
-//         area_list = [];
-//         aoi_num = 0;
-//     }
-// }
 function Refresh() { //清空poi list
     var del = confirm('確定重選?');
     if (del) {
@@ -252,54 +266,30 @@ function removePoi(id) { //刪除特定POI
       $('#choosen_title' + id).remove();
       area_list = [];
     }
-    // console.log(area_list);
-    
- 
+
 
     var mylist_order_Arr = document.getElementsByName('mylist_order');
     for(var i=0; i<mylist_order_Arr.length; i++){
         mylist_order_Arr[i].innerHTML = i+1;
     } 
-    removeMapMaker(mapCount-1); 
+    removeMapMarker(id); 
 
 }
 
-function addMapMaker(index , location, poiName){
-  var marker = new google.maps.Marker({
-    position:location,
-    label:poiName ,
-    animation: google.maps.Animation.DROP,
-    map:map2
-  });
-  map2.setCenter(location);
-  if(map2.getZoom() < 12){
-    map2.setZoom(12);
-  }
-  //alert("addMapMaker - index : "+index);
-  map_markers[index-1] = marker;
-  // console.log(map_markers);
-}
-
-function removeMapMaker(index){
-  map_markers[index].setMap(null);
-  while(typeof map_markers[index + 1] != 'undefined'){
-    map_markers[index] = map_markers[index + 1];
-    map_markers[index]['label'] = String(index);
-    map_markers[index].setMap(map2);
-    index = index + 1;
-  }
-  delete map_markers[index];
-}
-
-
-function myMap() {
-    var mapCanvas2 = document.getElementById("map_aoi");
-    var mapOptions2 = {
-        center: new google.maps.LatLng(23.5, 121),
-        zoom: 7
+function addMapMarker(index , location, poiName){
+    var marker = new H.map.Marker(location);
+    map2.addObject(marker);
+    map2.setCenter(location);
+    if(map2.getZoom() < 12){
+        map2.setZoom(12);
     }
-    map2 = new google.maps.Map(mapCanvas2, mapOptions2);
+    map_markers[index] = marker;
 }
+
+function removeMapMarker(index){
+    map2.removeObject(map_markers[index]);
+}
+
 
 function aoi_form(isDraft) {
     var final_valid_or_not_Arr = document.getElementsByName('final_valid_or_not');
@@ -366,7 +356,7 @@ function aoi_form(isDraft) {
     });
 }
 
-function aoi_table(ids) {       //***************************************************************************************************
+function aoi_table(ids) {       
     if (aoi_num == 0) {
         alert('尚未選擇poi!!');
     } else {
@@ -379,9 +369,7 @@ function aoi_table(ids) {       //**********************************************
             sequence[i] = i;
             poi_id[i] = myAOI_order_Arr[i].value;
         }
-        // for (var i = 0; i < aoi_num; i++) {
-        //     poi_id[i] = $('#pid' + i).val();
-        // }
+
         var data = {
             count: aoi_num,
             poi_id: poi_id,

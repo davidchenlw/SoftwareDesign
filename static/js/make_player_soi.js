@@ -9,6 +9,35 @@ var map2;
 var icon_url = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=';
 var icon_type = {'poi':'|FE6256|000000','loi':'|58ABFE|000000','aoi':'|1AFD9C|000000'};
 
+//Create a Here Map
+// Create a Platform object:
+var platform = new H.service.Platform({
+    'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
+});
+
+// Get an object containing the default map layers:
+var defaultLayers = platform.createDefaultLayers({lg:'cht'});
+
+// Instantiate the map using the vecor map with the
+// default style as the base layer:
+var map2 = new H.Map(
+    document.getElementById('map_soi'),
+    defaultLayers.raster.normal.map, {
+        zoom: 7,
+        center: { lat: 23.5, lng: 121.120850 }
+    });
+
+// Enable the event system on the map instance:
+var mapEvents = new H.mapevents.MapEvents(map2);
+
+
+// Instantiate the default behavior, providing the mapEvents object: 
+var behavior = new H.mapevents.Behavior(mapEvents);
+
+// Create the default UI:
+var ui = H.ui.UI.createDefault(map2, defaultLayers, 'zh-CN')
+
+
 $(window).on('beforeunload', function() {
     localStorage.setItem('soi_title', $('#soi_title').val());
     localStorage.setItem('soi_description', $('#soi_description').val());
@@ -67,17 +96,7 @@ function Choosen_soi(type, i) {
         event.preventDefault();
         can_choose = false;
     } else {
-        // if($('#list' + type + i).length){
-        //   if (type == 'poi') {
-        //       alert('重複景點囉!');
-        //   } else if (type == 'loi') {
-        //       alert('重複景線囉!');
-        //   } else {
-        //       alert('重複景區囉!');
-        //   }
-        //   can_choose = false;
-        //   event.preventDefault();
-        // }
+
         $('#choosen_id'+ type + i).each(function(event) {
             var ids = $('[id="' + this.id + '"]');
             if (ids.length > 0 && ids[0] == this) {
@@ -89,9 +108,7 @@ function Choosen_soi(type, i) {
         if (can_choose) { //景點景線景區列表
             area_list.push($('#areas').val());
             var temp_name="valid_or_not"+i;
-            // alert("temp_name : "+temp_name);
             var valid_or_not = document.getElementById(temp_name).value;
-            // alert(temp_name+" : "+valid_or_not);
             var str_valid_or_not="";
             switch(valid_or_not) {
                 case'0':
@@ -108,9 +125,7 @@ function Choosen_soi(type, i) {
                     str_valid_or_not="已驗證通過";
             }
             var temp_name="open_or_not"+i;
-            // alert("temp_name : "+temp_name);
             var open_or_not = document.getElementById(temp_name).value;
-            // alert(temp_name+" : "+open_or_not);
             var str_open_or_not="";
             switch(open_or_not) {
                 case'true':
@@ -123,20 +138,15 @@ function Choosen_soi(type, i) {
                     console.log('怪怪的喔');
                     str_open_or_not="公開";
             }
-            // $('#soi_list').append(
-            //   '<div id="list' + type + i + '" onclick="removeXoi(' + i + ',`' + type + '`)" value="' + type + i + '">\
-            //   <p style="display:inline;" id="choosen_id' + type + i + '">' + (soi_num + 1) + ':</p> \
-            //   <p style="margin-botton:0px; font-size:15px;display:inline; color:#00F;" id="choosen_title' + type + i + '"></p>\
-            //   <input class="inputId' + i + '" id="' + type[0] + 'id' + soi_num + '" type="hidden"  value="' + i + '"/><br></div>'
-            // );
+
             $('#items-list').append(
                 '<li id="choosen_title' + type + i + '" class="test" style="list-style-image: none;margin: 10px;border: 1px solid #ccc;padding: 4px;border-radius: 4px;color: #666;cursor: move;user-select: none; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none;" onclick="removeXoi(' + i + ',`' + type + '`)"></li>'
             );
             $('#choosen_title'+ type + i).html($('#choose_' + type + i).text()+"("+str_valid_or_not+"/"+str_open_or_not+")"+"<input name=\"pid\" id=\"pid" + soi_num + "\" type=\"hidden\"  value=\"" + i + "\"/><input name=\"pid_type\" id=\"pid_type" + soi_num + "\" type=\"hidden\"  value=\"" + type + "\"/><p hidden name=\"choose_order\" class=\"choose_order\" id=\"choosen_id"+ type + i + "\">" + (soi_num + 1) + "</p><input type=\"hidden\" name=\"final_valid_or_not\"  value=\"" + valid_or_not + "\"><p hidden name=\"mylist_order\"  id=\"mylist_order"+type + i + "\">" + (soi_num + 1) + "</p>");
-            // $('#choosen_title' + type + i).text($('#choose_' + type + i).text());
+
             var latlng = $('#latlng' + type + i).val().split(",");
             var location = {lat:Number(latlng[0]) , lng:Number(latlng[1])};
-            addMapMaker(soi_num + 1 , location , type,$('#choose_' + type + i).text());
+            addMapMarker(i , location , type,$('#choose_' + type + i).text());
             soi_num++;
             //Group the items(li) in list(ul)
             items = document.querySelectorAll('.test');
@@ -161,11 +171,6 @@ function dropped (e) {
   let oldIndex = e.dataTransfer.getData('text/plain')
   let target = $(e.target)
   let newIndex = target.index()
-
-  // console.log("oldIndex : "+oldIndex);
-  // console.log("target : "+target);
-  // console.log("newIndex : "+newIndex);
-
 
      
     //clearMap();
@@ -201,15 +206,6 @@ function dropped (e) {
                 map_markers[i]=temp[i];
         }
     }
-
-    // console.log("map_markers :");
-    // console.log(map_markers);
-    // console.log("temp :");
-    // console.log(temp);
-    //map_markers[newIndex] = temp[0];
-    //console.log(map_markers);
-
-    //rebuildMap();
 
   
   // remove dropped items at old place
@@ -270,43 +266,23 @@ function removeXoi(id, type) { //刪除特定XOI
     for(var i=0; i<mylist_order_Arr.length; i++){
         mylist_order_Arr[i].innerHTML = i+1;
     }
-    removeMapMaker(mapCount-1);
+    removeMapMarker(id);
 }
 
-function myMap() {
-    var mapCanvas2 = document.getElementById("map_soi");
-    var mapOptions2 = {
-        center: new google.maps.LatLng(23.5, 121),
-        zoom: 7
+
+
+function addMapMarker(index , location,type, xoiName){
+    var marker = new H.map.Marker(location);
+    map2.addObject(marker);
+    map2.setCenter(location);
+    if(map2.getZoom() < 12){
+        map2.setZoom(12);
     }
-    map2 = new google.maps.Map(mapCanvas2, mapOptions2);
+    map_markers[index] = marker;
 }
 
-function addMapMaker(index , location , type,xoiName){
-  var icon = icon_url +xoiName+  icon_type[type];
-  var marker = new google.maps.Marker({
-    position:location,
-    icon:icon,
-    animation: google.maps.Animation.DROP,
-    map:map2
-  });
-  map2.setCenter(location);
-  if(map2.getZoom() < 12){
-    map2.setZoom(12);
-  }
-  map_markers[index-1] = marker;
-}
-
-function removeMapMaker(index){
-  map_markers[index].setMap(null);
-  while(typeof map_markers[index + 1] != 'undefined'){
-    map_markers[index] = map_markers[index + 1];
-    temp = map_markers[index + 1]['icon'].split("|");
-    map_markers[index]['icon'] = icon_url + String(index) + "|" + temp[1] + "|" + temp[2];
-    map_markers[index].setMap(map2);
-    index = index + 1;
-  }
-  delete map_markers[index];
+function removeMapMarker(index){
+    map2.removeObject(map_markers[index]);
 }
 
 function soi_form(e) {
@@ -320,7 +296,7 @@ function soi_form(e) {
         }
     }
     console.log(open)
-    // alert("valid_flag : "+valid_flag);
+
     if(valid_flag==false && open==1){
         alert("選擇內容含有 私有/尚未驗證/驗證不通過 之選項，請改為不公開!");
         $('#loading').hide();
@@ -328,7 +304,6 @@ function soi_form(e) {
     }        
     alert("成功通過");
     var my_areas = area_list[0];
-    // var open = $('#open').val();
     if(my_areas == null){
         // alert("is null");
         my_areas="TainanEast";
@@ -373,22 +348,9 @@ function soi_table(ids) {
         var urls = "/ajax_soistory";
         var xoi_id = [];
         var soi_id = ids;
-        // for (var i = 0; i < soi_num; i++) {
-        //     if ($('#pid' + i).length != 0) {
-        //         xoi_id[i] = { "id": $('#pid' + i).val(), "type": 'poi' };
-        //     } else if ($('#lid' + i).length != 0) {
-        //         xoi_id[i] = { "id": $('#lid' + i).val(), "type": 'loi' };
-        //     } else if ($('#aid' + i).length != 0) {
-        //         xoi_id[i] = { "id": $('#aid' + i).val(), "type": 'aoi' };
-        //     } else {
-        //         console.log("Type error!");
-        //     }
-        // }
         var mySOI_order_Arr = document.getElementsByName('pid');
         var mySOI_type_order_Arr = document.getElementsByName('pid_type');
         for (var i = 0; i < soi_num; i++) {
-            // sequence[i] = i;
-            // poi_id[i] = mySOI_order_Arr[i].value;
             xoi_id[i] = { "id": mySOI_order_Arr[i].value, "type": mySOI_type_order_Arr[i].value };
         }
         console.log(xoi_id);

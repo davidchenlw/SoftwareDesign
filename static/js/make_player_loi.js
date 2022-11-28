@@ -8,21 +8,7 @@ var map_markers = new Array();
 
 items = document.querySelectorAll('.test');
 
-$(window).on('beforeunload', function() {
-    localStorage.setItem('loi_title', $('#route_title').val());
-    localStorage.setItem('loi_description', $('#route_description').val());
-    localStorage.setItem('loi_transportation', $('#transportation').val());
-});
-
-window.onload = function() {
-    var title = localStorage.getItem('loi_title');
-    if (title != null) $('#route_title').val(title);
-    var description = localStorage.getItem('loi_description');
-    if (description != null) $('#route_description').val(description);
-    var transportation = localStorage.getItem('loi_transportation');
-    if (transportation != null) $('#transportation').val(transportation);
-}
-
+//Create a Here Map
 // Create a Platform object:
 var platform = new H.service.Platform({
     'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
@@ -49,6 +35,23 @@ var behavior = new H.mapevents.Behavior(mapEvents);
 
 // Create the default UI:
 var ui = H.ui.UI.createDefault(map2, defaultLayers, 'zh-CN')
+
+$(window).on('beforeunload', function() {
+    localStorage.setItem('loi_title', $('#route_title').val());
+    localStorage.setItem('loi_description', $('#route_description').val());
+    localStorage.setItem('loi_transportation', $('#transportation').val());
+});
+
+window.onload = function() {
+    var title = localStorage.getItem('loi_title');
+    if (title != null) $('#route_title').val(title);
+    var description = localStorage.getItem('loi_description');
+    if (description != null) $('#route_description').val(description);
+    var transportation = localStorage.getItem('loi_transportation');
+    if (transportation != null) $('#transportation').val(transportation);
+}
+
+
 
 $(document).ready(function() {
     $('#make_loiform').submit(function(e) {
@@ -112,9 +115,7 @@ function Choosen_loi(i) { //列出poi list
         if (can_choose) {
             area_list.push($('#areas').val());
             var temp_name="valid_or_not"+i;
-            // alert("temp_name : "+temp_name);
             var valid_or_not = document.getElementById(temp_name).value;
-            // alert(temp_name+" : "+valid_or_not);
             var str_valid_or_not="";
             switch(valid_or_not) {
                 case'0':
@@ -127,13 +128,10 @@ function Choosen_loi(i) { //列出poi list
                     str_valid_or_not="驗證不通過";
                     break;
                 default:
-                    //console.log('怪怪的喔');
                     str_valid_or_not="已驗證通過";
             }
             var temp_name="open_or_not"+i;
-            // alert("temp_name : "+temp_name);
             var open_or_not = document.getElementById(temp_name).value;
-            // alert(temp_name+" : "+open_or_not);
             var str_open_or_not="";
             switch(open_or_not) {
                 case'true':
@@ -143,7 +141,6 @@ function Choosen_loi(i) { //列出poi list
                     str_open_or_not="不公開";
                     break;
                 default:
-                    //console.log('怪怪的喔');
                     str_open_or_not="公開";
             }
             $('#items-list').append(
@@ -156,7 +153,6 @@ function Choosen_loi(i) { //列出poi list
             var location = {lat:Number(latlng[0]) , lng:Number(latlng[1])};
             addMapMarker(i , location,$('#choose_loi' + i).text());
             loi_num++;
-            //Group the items(li) in list(ul)
             items = document.querySelectorAll('.test');
             items.forEach(item => {
               $(item).prop('draggable', true)
@@ -175,6 +171,7 @@ function dragStart (e) {
   var index = $(e.target).index()
   e.dataTransfer.setData('text/plain', index)
 }
+
 function dropped (e) {
   cancelDefault(e)
   
@@ -183,13 +180,6 @@ function dropped (e) {
   let target = $(e.target)
   let newIndex = target.index()
 
-  // console.log("oldIndex : "+oldIndex);
-  // console.log("target : "+target);
-  // console.log("newIndex : "+newIndex);
-
-
-     
-    //clearMap();
     if(oldIndex < newIndex){
         var temp = new Array();
         for(var i=0;i<loi_num;i++){
@@ -223,31 +213,22 @@ function dropped (e) {
         }
     }
 
-    // console.log("map_markers :");
-    // console.log(map_markers);
-    // console.log("temp :");
-    // console.log(temp);
-    //map_markers[newIndex] = temp[0];
-    //console.log(map_markers);
-
-    //rebuildMap();
-
   
-  // remove dropped items at old place
-  if (newIndex == oldIndex) //避免原地移動造成意外刪除
-    return
-  let dropped = $(this).parent().children().eq(oldIndex).remove()
+    // remove dropped items at old place
+    if (newIndex == oldIndex) //避免原地移動造成意外刪除
+        return
+    let dropped = $(this).parent().children().eq(oldIndex).remove()
 
-  // insert the dropped items at new place
-  if (newIndex < oldIndex) {
-    target.before(dropped)
-  } else {
-    target.after(dropped)
-  }
-  var mylist_order_Arr = document.getElementsByName('mylist_order');
-  for(var i=0; i<mylist_order_Arr.length; i++){
-      mylist_order_Arr[i].innerHTML = i+1;
-  }
+    // insert the dropped items at new place
+    if (newIndex < oldIndex) {
+        target.before(dropped)
+    } else {
+        target.after(dropped)
+    }
+    var mylist_order_Arr = document.getElementsByName('mylist_order');
+    for(var i=0; i<mylist_order_Arr.length; i++){
+        mylist_order_Arr[i].innerHTML = i+1;
+    }
 }
 
 function cancelDefault (e) {
@@ -278,9 +259,6 @@ function removePoi(id) { //刪除特定POI
       $('#choosen_title' + id).remove();
       area_list = [];
     }
-    //console.log(mapCount-1);
-    
- 
 
     var mylist_order_Arr = document.getElementsByName('mylist_order');
     for(var i=0; i<mylist_order_Arr.length; i++){
@@ -300,21 +278,10 @@ function Refresh() { //清空poi list
         map_markers = [];
     }
 }
+
 function clearMap(){
     map2.removeObjects(map2.getObjects());
 }
-
-
-/*
-function myMap() {
-    var mapCanvas2 = document.getElementById("map_loi");
-    var mapOptions2 = {
-        center: new google.maps.LatLng(23.5, 121),
-        zoom: 7
-    }
-    map2 = new google.maps.Map(mapCanvas2, mapOptions2);
-}*/
-
 
 function addMapMarker(index , location, poiName){
     var marker = new H.map.Marker(location);
@@ -323,13 +290,10 @@ function addMapMarker(index , location, poiName){
     if(map2.getZoom() < 12){
         map2.setZoom(12);
     }
-    //alert("addMapMarker - index : "+index);
     map_markers[index] = marker;
-    //console.log(index);
 }
 
 function removeMapMarker(index){
-    //console.log('remove'+index);
     map2.removeObject(map_markers[index]);
 }
 
@@ -340,7 +304,6 @@ function loi_form(isDraft) {
         return
     }
     var final_valid_or_not_Arr = document.getElementsByName('final_valid_or_not');
-    // var open = $('.selectPublic').val();
     var open = $('#open').val();
     var valid_flag=true;
     for(var i=0;i<loi_num;i++){
@@ -349,7 +312,6 @@ function loi_form(isDraft) {
             break;
         }
     }
-    // alert("valid_flag : "+valid_flag);
     if(valid_flag==false && open=="1"){
         alert("選擇內容含有 私有/尚未驗證/驗證不通過 之選項，請改為不公開!");
         $('#loading').hide();
@@ -360,7 +322,6 @@ function loi_form(isDraft) {
     var first_poi_id = myLOI_order_Arr[0].value;
     var my_areas = area_list[0];
     if(my_areas == null){
-        // alert("is null");
         my_areas="TainanEast";
     }
     var transportation = $('#transportation').val();
@@ -489,7 +450,6 @@ $('#areas').change(function () { //地區分類篩選
         event.preventDefault();
         alert("請先選擇地區");
     }
-    // alert("change area");
     var urls = POI_URL;
     var data = {
         citys: citys,
@@ -609,7 +569,6 @@ function dataAppend(data) {
 
     $('.poi_detail').empty();
     var media_counts = data.all_poi.length;
-    //alert(media_counts);
     var none_counts = data.no_list.length;
     var open = $('#open').val();
 
@@ -647,7 +606,6 @@ function dataAppend(data) {
         if (open == 1 && data.all_poi[i].foreignkey__rights == username && data.all_poi[i].foreignkey__identifier != 'docent' && data.all_poi[i].foreignkey__open != 1) 
         {
             div_poi_detail.append
-            // data-target="#loi_modal
             (
                 '<button type="button" class="choose_loi" id="choose_loi' + data.all_poi[i].foreignkey__poi_id + '" \
                       style="margin-botton:0px; font-size:15px; color:#00F;" onclick="Choosen_loi(' + data.all_poi[i].foreignkey__poi_id + ')">' +
@@ -698,7 +656,6 @@ function dataAppend(data) {
         }
         if (open == 1 && data.no_list[i].rights == username && data.no_list[i].identifier != 'docent' && data.no_list[i].foreignkey__open != 1) {
             div_poi_detail.append
-            // data-target="#loi_modal
             (
                 '<button type="button" class="choose_loi" id="choose_loi' + data.no_list[i].poi_id + '" \
                       style="margin-botton:0px; font-size:15px; color:#00F;"  onclick="Choosen_loi(' + data.no_list[i].poi_id + ')">' +

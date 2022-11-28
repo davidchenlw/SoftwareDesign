@@ -3,10 +3,59 @@ sound_count = 0; //語音導覽
 finalFiles = []; //多媒體檔案(圖)
 temp_media_format = ""; //media的format暫存
 var is_edit = false;
+
+//Create a Here Map
+// Create a Platform object:
+var platform = new H.service.Platform({
+    'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
+});
+
+// Get an object containing the default map layers:
+var defaultLayers = platform.createDefaultLayers({lg:'cht'});
+
+// Instantiate the map using the vecor map with the
+// default style as the base layer:
+var map = new H.Map(
+    document.getElementById('map_poi'),
+    defaultLayers.raster.normal.map, {
+        zoom: 8,
+        center: { lat: 23.5, lng: 121.120850 },
+        pixelRatio: window.devicePixelRatio || 1
+    });
+
+// Enable the event system on the map instance:
+var mapEvents = new H.mapevents.MapEvents(map);
+
+// Instantiate the default behavior, providing the mapEvents object: 
+var behavior = new H.mapevents.Behavior(mapEvents);
+
+// Create the default UI:
+var ui = H.ui.UI.createDefault(map, defaultLayers, 'zh-CN')
+
+// Add event listener:
+map.addEventListener('tap', function(evt) {
+    var coord = map.screenToGeo(evt.currentPointer.viewportX,evt.currentPointer.viewportY);
+
+    document.getElementById("latitude").value = coord.lat;
+    document.getElementById("longitude").value = coord.lng;
+
+    var service = platform.getSearchService();
+    
+    service.reverseGeocode({
+        at: coord.lat+','+coord.lng
+        }, (result) => {
+        result.items.forEach((item) => {
+            document.getElementById("poi_address").value = item.address.label;
+            placeMarker(item.position);
+
+        });
+    },alert);
+});
+
+
+
 $(window).on('beforeunload', function () {
     localStorage.setItem('poi_title', $('#poi_title').val());
-    //localStorage.setItem('poi_subject', $('#subject').val());
-    //localStorage.setItem('poi_type', $('#type1').val());
     localStorage.setItem('poi_keyword1', $('#keyword1').val());
     localStorage.setItem('poi_keyword2', $('#keyword2').val());
     localStorage.setItem('poi_keyword3', $('#keyword3').val());
@@ -16,16 +65,11 @@ $(window).on('beforeunload', function () {
     localStorage.setItem('poi_longitude', $('#longitude').val());
     localStorage.setItem('poi_description', $('#poi_description_1').val());
     localStorage.setItem('poi_format', $('#format').val());
-    //localStorage.setItem('poi_source', $('#poi_source').val());
 });
 
 window.onload = function () {
     var title = localStorage.getItem('poi_title');
     if (title != null) $('#poi_title').val(title);
-    /*var subject = localStorage.getItem('poi_subject');
-    if (subject != null) $('#subject').val(subject);
-    var type1 = localStorage.getItem('poi_type');
-    if (type1 != null) $('#type1').val(type1);*/
     var keyword1 = localStorage.getItem('poi_keyword1');
     if (keyword1 != null) $('#keyword1').val(keyword1);
     var keyword2 = localStorage.getItem('poi_keyword2');
@@ -44,8 +88,7 @@ window.onload = function () {
     if (description != null) $('#poi_description_1').val(description);
     var format = localStorage.getItem('poi_format');
     if (format != null) $('#format').val(format);
-    /*var source = localStorage.getItem('poi_source');
-    if (source != null) $('#poi_source').val(source);*/
+
 }
 $(document).ready(function () {
 
@@ -196,58 +239,7 @@ $(document).ready(function () {
     });
 });
 
-// Create a Platform object:
-var platform = new H.service.Platform({
-    'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
-});
 
-// Get an object containing the default map layers:
-var defaultLayers = platform.createDefaultLayers({lg:'cht'});
-
-// Instantiate the map using the vecor map with the
-// default style as the base layer:
-var map = new H.Map(
-    document.getElementById('map_poi'),
-    defaultLayers.raster.normal.map, {
-        zoom: 8,
-        center: { lat: 23.5, lng: 121.120850 },
-        pixelRatio: window.devicePixelRatio || 1
-    });
-
-// Enable the event system on the map instance:
-var mapEvents = new H.mapevents.MapEvents(map);
-
-
-// Instantiate the default behavior, providing the mapEvents object: 
-var behavior = new H.mapevents.Behavior(mapEvents);
-
-// Create the default UI:
-var ui = H.ui.UI.createDefault(map, defaultLayers, 'zh-CN')
-
-
-
-// Add event listener:
-map.addEventListener('tap', function(evt) {
-    var coord = map.screenToGeo(evt.currentPointer.viewportX,evt.currentPointer.viewportY);
-    //console.log(evt.type, coord);
-    document.getElementById("latitude").value = coord.lat;
-    document.getElementById("longitude").value = coord.lng;
-    //$('#latitude').val(coord.lat);
-    //$('#longitude').val(coord.lng);
-    var service = platform.getSearchService();
-    
-    service.reverseGeocode({
-        at: coord.lat+','+coord.lng
-        }, (result) => {
-        result.items.forEach((item) => {
-            document.getElementById("poi_address").value = item.address.label;
-            placeMarker(item.position);
-            /*ui.addBubble(new H.ui.InfoBubble(item.position, {
-            content: item.address.label
-            }));*/
-        });
-    },alert);
-});
 
 function handleFileSelect(evt) {
     $('.alert-danger').hide();
@@ -352,9 +344,6 @@ function handleVideo(evt) {
     file = files[0];
 
     reader.readAsDataURL(file);
-    //alert(file.name);
-
-
 
     var re = /\.(avi|ogg|webm|mp4)$/i;  //允許的影片副檔名 
     if(!re.test(file.name)){
@@ -363,9 +352,7 @@ function handleVideo(evt) {
         return false;
     }
 
-
     reader.onload = function (evt) {
-        //alert(evt.target.result);
         alert("load video");
         alert(URL.createObjectURL(file));
         $('#disp_video').attr("src", URL.createObjectURL(file));
@@ -379,9 +366,6 @@ function handleAudio(evt) {
     file = files[0];
 
     reader.readAsDataURL(file);
-    //alert(file.name);
-
-
 
     var re = /\.(wav|mp3|ogg)$/i;  //允許的圖片副檔名 
     if(!re.test(file.name)){
@@ -390,9 +374,7 @@ function handleAudio(evt) {
         return false;
     }
 
-
     reader.onload = function (evt) {
-        //alert(evt.target.result);
         $('#disp_audio').attr("src", evt.target.result);
     }
     image_count++;
@@ -404,9 +386,6 @@ function handleSound(evt) {
     file = files[0];
 
     reader.readAsDataURL(file);
-    //alert(file.name);
-
-
 
     var re = /\.(wav|mp3|ogg)$/i;  //允許的圖片副檔名 
     if(!re.test(file.name)){
@@ -415,12 +394,10 @@ function handleSound(evt) {
         return false;
     }
 
-
     reader.onload = function (evt) {
         //alert(evt.target.result);
         $('#disp_sound').attr("src", evt.target.result);
     }  
-
     sound_count++;
 }
 
@@ -437,7 +414,6 @@ function placeMarker(location) {
     map.setCenter(location);
     map.setZoom(16);
 }
-
 
 
 function poi_form(isDraft) {  // poi 提交表格
@@ -661,7 +637,6 @@ function poi_form(isDraft) {  // poi 提交表格
                                 }
                     
                             }
-                            // $('#loading').hide();
                         },
                         error: function (data) {
                          
@@ -878,13 +853,7 @@ function CheckStrIn(city, area, address) {
     if (city == "其他國家及地區" || city == "南海諸島") {
         chk_city = 1;
         chk_area = 1;
-        // if (area.length > address) {
-        //     chk_city = 1;
-        //     chk_area = area.indexOf(address);
-        // } else {
-        //     chk_city = 1;
-        //     chk_area = address.indexOf(area);
-        // }
+
     } else {
         if (city.length > address || area.length > address) {
             chk_city = city.indexOf(address);
@@ -913,8 +882,7 @@ $('.selectPublic').on('click', event => {
 $('#trans_addr_but').on('click', function () {
     // 取得地址
     var poi_address = $('#poi_address').val();
-    //alert(poi_address);
-    //console.log(typeof(poi_address));
+
     var platform = new H.service.Platform({
         'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
       });

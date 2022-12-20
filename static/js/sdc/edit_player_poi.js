@@ -108,24 +108,12 @@ $(document).ready(function() {
     }
     else if (chk == 2){
       $('#audio_file').change(function(evt) {
-        if(image_count < 1){
-          handleAudio(evt);
-        }
-        else{
-          alert("聲音檔只能上傳一個");
-          $('#audio_file').val('');
-        }
+        handleAudio(evt);
       });
     }
     else if (chk == 4){
       $('#video_file').change(function(evt) {
-        if(image_count < 1){
-          handleVideo(evt);
-        }
-        else{
-          alert("影片檔只能上傳一個");
-          $('#video_file').val('');
-        }
+        handleVideo(evt);
       });
     }
 
@@ -141,7 +129,7 @@ $(document).ready(function() {
     });
 
     if(chk == '' && chk_sound == ''){
-        alert("無多媒體資料");
+        //alert("無多媒體資料");
         //chk = 1;
         //break;
       //$('.upload_none').empty();
@@ -151,11 +139,7 @@ $(document).ready(function() {
     
     $('#make_poiform').submit(function(e){
         e.preventDefault();
-        if(image_count > 0){
-            if(temp_flag == true) {
-                temp_flag = false;
-                delete_img(temp_media_id, temp_media_name, temp_media_format);
-            }
+        if(image_count > 0  || $('.sound_file')){
             url = '/session/' + "POIDraft"+"/"+"false"
             $.ajax({
                 url: url,
@@ -170,14 +154,11 @@ $(document).ready(function() {
             });
         }
         else{
-
-            //image_count = 1;
-            /*$('.alert-danger').empty();
+            $('.alert-danger').empty();
             $('.alert-danger').show();
             $('.alert-danger').append('<p>至少需要一個多媒體檔案或是語音導覽!</p>');
 
-            return false;*/
-            if(confirm("您尚未上傳多媒體檔案，確定要送出嗎?")) poi_form();
+            return false;
         }
     });
     if($('#poi_source').val()){
@@ -218,6 +199,7 @@ $(document).ready(function() {
         var upload_video = $('.upload_video').empty();
         var upload_audio = $('.upload_audio').empty();
         if (this.value == 'image') {
+            temp_media_format = "1"
             if (document.getElementById('language').value == "chinese") {
                 restrict.html('允許上傳gif/jpg/png/jpeg格式的圖片，圖片檔案大小不能超過2M(可上傳5張照片)');
             } else if (document.getElementById('language').value == "english") {
@@ -233,7 +215,7 @@ $(document).ready(function() {
                 el.addEventListener('change', handleFileSelect, false);
             }
         } else if (this.value == 'video') {
-            image_count = 0;
+            temp_media_format = "4"
             if (document.getElementById('language').value == "chinese") {
                 restrict.html('允許上傳mp4/avi格式的影片，影片檔案大小不能超過15M');
             } else if (document.getElementById('language').value == "english") {
@@ -249,7 +231,7 @@ $(document).ready(function() {
                 el.addEventListener('change', handleVideo, false);
             }
         } else if (this.value == 'audio') {
-            image_count = 0;
+            temp_media_format = "2"
             if (document.getElementById('language').value == "chinese") {
                 restrict.html('允許上傳amr/3gpp/aac格式的錄音檔，檔案大小不能超過5M');
             } else if (document.getElementById('language').value == "english") {
@@ -814,7 +796,7 @@ function poi_sound(format, ids) {
 
 
 function delete_img(id, name, format) {
-    del = confirm("確定刪除?");
+    var del = confirm("確定刪除?");
     var urls = "/delete_media";
     var rmv = $('#edit_' + id);
     var data = {

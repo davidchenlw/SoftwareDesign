@@ -117,7 +117,7 @@
                         <input type="text" name="poi_address" id="poi_address" value="{{edit_poi.poi_address}}">
                         <br>
                         <small id="Changhua_map">(ex:彰化縣鹿港鎮民族路228號)可利用地圖自動取得地址與經緯度(在地圖上按左鍵)</small>
-                        <div id="map_poi" style="width:500px;height:500px"></div>
+                        <div id="map_poi" style="width:90%;max-width: 500px;aspect-ratio : 1 / 1;"></div>
                         <div style="margin-top: 5px;">
                             <p style="display: inline;" id="lati">緯度:</p>
                             <input type="number" name="latitude" id="latitude" value="{{edit_poi.latitude}}" step="0.0000000000000001">
@@ -194,65 +194,29 @@
                             <input type="file" name="sound_file" accept=".amr,.3gpp,.aac,.mp3" id="sound_file">
                             <audio controls id="disp_sound"></audio>
                         </div>
-                        <!--div class="upload_nothing">
-                            <input id="nothing" type="radio" name="sounds" value="none">
-                            <p id="none_file" style="display: inline;">無</p>
-                            <input class="sound_val" name="sounds" value="0" hidden>
-                            <p id="restrict1">
-                                <p id="none_guide" style="display: inline;">無語音導覽檔案</p>
-                        </div-->
                         <br>
                     </div>
                     <div class="form-group">
                         <label id="upload_media">上傳照片/聲音/影片</label>
-                        <br> {% if mpeg_format.format == 1 %}
-                        <div class="upload_image">
-                            <input id="image" type="radio" name="media" value="image">
-                            <p class="img_file" style="display: inline;">相片
-                            
-                            <p id="gif_jpg_png" style="display: inline;">允許上傳gif/jpg/png/jpeg格式的圖片，圖片檔案大小不能超過2M(可上傳5張照片)</p>
-                            <input class="media_val" name="media" value="0" hidden>
-                            <input type="file" name="image_file" accept=".gif,.jpg,.png,.jpeg" id="image_file" multiple>
-                            <output id="image_list">
-                        </div>
-                        {% elif mpeg_format.format == 2 %}
-                        <input id="audio" type="radio" name="media" value="audio"> 聲音
-                        
-                        <p id="3ggp" style="display: inline;">允許上傳amr/3gpp/aac格式的錄音檔，檔案大小不能超過5M</p>
-                        <div class="upload_audio">
-                            <input class="media_val" name="media" value="0" hidden>
-                            <input type="file" name="audio_file" accept=".amr,.3gpp,.aac,.mp3" id="audio_file">
-                            <audio controls id="disp_audio"></audio>
-                        </div>
-                        {% elif mpeg_format.format == 4 %}
-                        <input id="video" type="radio" name="media" value="video"> 影片
-                        
-                        <p id="mp4_avi" style="display: inline;">允許上傳mp4/avi格式的影片，影片檔案大小不能超過15M</p>
-                        <div class="upload_video">
-                            <input class="media_val" name="media" value="0" hidden>
-                            <input type="file" name="video_file" accept=".mp4,.api" id="video_file">
-                            <video controls id="disp_video"></video>
-                        </div>
-                        {%else%}
-                            <input type="radio" name="new_media" value="none" hidden>
-                            <!-- 無 -->
-                            <input type="radio" id="img_file-1" name="new_media" value="image">
-                            <label id="img_file" class="img_file" for="img_file-1">相片</label>
-                            <input type="radio" id="video_file-1" name="new_media" value="video">
-                            <label id="video_file-1" for="video_file-1">影片</label>
-                            <input type="radio" id="audio_file-1" name="new_media" value="audio">
-                            <label id="audio_file-1" for="audio_file-1">聲音</label>
-                            <br>
-                            <p id="restrict"></p>
-                            <div class="upload_none" hidden></div>
-                            <div class="upload_image"></div>
-                            <div class="upload_video"></div>
-                            <div class="upload_audio"></div>
+                        <input type="radio" name="new_media" value="none" hidden>
+                        <!-- 無 -->
+                        <input type="radio" id="img_file-1" name="new_media" value="image">
+                        <label id="img_file" class="img_file" for="img_file-1">相片</label>
+                        <input type="radio" id="video_file-1" name="new_media" value="video">
+                        <label id="video_file-1" for="video_file-1">影片</label>
+                        <input type="radio" id="audio_file-1" name="new_media" value="audio">
+                        <label id="audio_file-1" for="audio_file-1">聲音</label>
+                        <br>
+                        <p id="restrict"></p>
+                        <div class="upload_none" hidden></div>
+                        <div class="upload_image"></div>
+                        <div class="upload_video"></div>
+                        <div class="upload_audio"></div>
                         <!--p id="restrict">無多媒體檔案</p>
                         <div class="upload_none" hidden>
                             <input class="media_val" name="media" value="0" hidden>
                         </div-->
-                        {% endif %}
+                        
                     </div>
                     <input id="user_id" type="text" name="user" value="{{username}}" hidden>
                     <button type="submit" class="btn btn-default" id="btn_confirm">確認</button>
@@ -266,40 +230,51 @@
             <span class="label label-success sound_guide">語音導覽</span>
             <div class="edit_sound" id="edit_{{m.picture_id}}">
                 <audio controls src="/player_pictures/media/audio/{{m.picture_name}}"></audio>
-                <button id="{{m.picture_id}}" onclick="delete_confirm({{m.picture_id}},'{{m.picture_name}}','{{m.format}}')">
+                <button id="{{m.picture_id}}" class="btn btn-warning " onclick="delete_img({{m.picture_id}},'{{m.picture_name}}','{{m.format}}')">
                     <p class="delete_file" style="display: inline;">刪除</p>
                 </button>
             </div>
-            {% endif %} {% endfor %} {% for m in edit_mpeg %} {% if m.format == 1 %}
-            <span class="label label-success"><p class="img_file" style="display: inline;">圖片</p></span>
-            <div class="edit_image" id="edit_{{m.picture_id}}">
-                {%if 'http' not in m.picture_url %}<img style="width:200px; height: 200px;" src="/player_pictures/media/{{m.picture_name}}">
-                {%else%}<img style="width:200px; height: 200px;" src={{m.picture_url}}>{% endif %}
-                <button id="{{m.picture_id}}" onclick="delete_confirm({{m.picture_id}},'{{m.picture_name}}','{{m.format}}')">
-                    <p class="delete_file" style="display: inline;">刪除</p>
-                </button>
-            </div>
-            {% elif m.format == 2 %}
-            <span class="label label-success sound_file">聲音</span>
-            <div class="edit_audio" id="edit_{{m.picture_id}}">
-                {%if 'http' not in m.picture_url %}<audio controls src="/player_pictures/media/audio/{{m.picture_name}}"></audio>
-                {%else%}<audio controls src={{m.picture_url}}></audio>{% endif %}
-                <button id="{{m.picture_id}}" onclick="delete_confirm({{m.picture_id}},'{{m.picture_name}}','{{m.format}}')">
-                    <p class="delete_file" style="display: inline;">刪除</p>
-                </button>
-            </div>
-            {% elif m.format == 4 %}
-            <span class="label label-success video_file">影片</span>
-            <div class="edit_video" id="edit_{{m.picture_id}}">
-                {%if 'http' not in m.picture_url %}<video controls src="/player_pictures/media/video/{{m.picture_name}}"></video>
-                {%else%}<video controls src={{m.picture_url}}></video>{% endif %}
-                <button id="{{m.picture_id}}" onclick="delete_confirm({{m.picture_id}},'{{m.picture_name}}','{{m.format}}')">
-                    <p class="delete_file" style="display: inline;">刪除</p>
-                </button>
-            </div>
-            {%else%}
-            <div class="edit_none"></div>
-            {% endif %} {% endfor%}
+            <br>
+            {% endif %}
+            {% endfor %} 
+
+            {% if edit_mpeg.count == 0 %}
+                    <div class="edit_none"></div>
+            {% else %}
+                {% for m in edit_mpeg %} 
+                    {% if m.format == 1 %}
+                    <span class="label label-success"><p class="img_file" style="display: inline;">圖片</p></span>
+                    <div class="edit_image" id="edit_{{m.picture_id}}">
+                        {%if 'http' not in m.picture_url %}<img style="width:200px; height: 200px;" src="/player_pictures/media/{{m.picture_name}}">
+                        {%else%}<img style="width:200px; height: 200px;" src={{m.picture_url}}>{% endif %}
+                        <button id="{{m.picture_id}}" class="btn btn-warning " onclick="delete_img({{m.picture_id}},'{{m.picture_name}}','{{m.format}}')">
+                            <p class="delete_file" style="display: inline;">刪除</p>
+                        </button>
+                    </div>
+                    <br>
+                    {% elif m.format == 2 %}
+                    <span class="label label-success sound_file">聲音</span>
+                    <div class="edit_audio" id="edit_{{m.picture_id}}">
+                        {%if 'http' not in m.picture_url %}<audio controls src="/player_pictures/media/audio/{{m.picture_name}}"></audio>
+                        {%else%}<audio controls src={{m.picture_url}}></audio>{% endif %}
+                        <button id="{{m.picture_id}}" class="btn btn-warning " onclick="delete_img({{m.picture_id}},'{{m.picture_name}}','{{m.format}}')">
+                            <p class="delete_file" style="display: inline;">刪除</p>
+                        </button>
+                    </div>
+                    <br>
+                    {% elif m.format == 4 %}
+                    <span class="label label-success video_file">影片</span>
+                    <div class="edit_video" id="edit_{{m.picture_id}}">
+                        {%if 'http' not in m.picture_url %}<video controls src="/player_pictures/media/video/{{m.picture_name}}"></video>
+                        {%else%}<video controls src={{m.picture_url}}></video>{% endif %}
+                        <button id="{{m.picture_id}}" class="btn btn-warning " onclick="delete_img({{m.picture_id}},'{{m.picture_name}}','{{m.format}}')">
+                            <p class="delete_file" style="display: inline;">刪除</p>
+                        </button>
+                    </div>
+                    <br>
+                    {% endif %} 
+                {% endfor%}
+            {% endif %}
             <div id="loading" hidden><img src="/static/images/loading.gif" style="display: block; margin:1080px 400px;"></div>
         </div>
     </div>
@@ -312,15 +287,21 @@
     <script type="text/javascript">
     is_edit = true;
     areas = "{{edit_poi.area_name_en}}";
-    image_count = "{{edit_mpeg.count}}";
+    edit_mpeg =  "{{edit_mpeg}}";
     sound_count = "{{edit_sound.count}}";
-    image_count = parseInt(image_count);
+    image_count = 0
     sound_count = parseInt(sound_count);
     orig_count = parseInt(image_count);
     chk = "{{mpeg_format.format}}";
+    push_media_type = "{{mpeg_format.format}}";
     chk_sound = "{{sound_format.format}}";
     languages ="{{language}}"
     $(document).ready(function() {
+        for(var i = 0 ;i<edit_mpeg.length;i++){
+            if(edit_mpeg[i].format==1){
+                image_count++;
+            }
+        } 
         $.ajax({
             method: "POST",
             data: {
@@ -433,6 +414,19 @@
         const HOME_URL = '/{{coi}}/make_player';
     </script>
 </body>
-
+<style>
+    #map_poi>div>div>div>canvas {
+        width: 100%!important;
+        max-width: 500px;
+        height: auto!important;
+        aspect-ratio:1;
+    }
+    #disp_video{
+        max-width: 500px;
+    }
+    .edit_video > video{
+        max-width: 500px;
+    }
+</style>
 
 </html>

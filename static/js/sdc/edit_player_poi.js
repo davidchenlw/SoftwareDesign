@@ -154,7 +154,7 @@ $(document).ready(function() {
         if(image_count > 0){
             if(temp_flag == true) {
                 temp_flag = false;
-                delete_img(temp_media_id, temp_media_name, temp_media_format, true);
+                delete_img(temp_media_id, temp_media_name, temp_media_format);
             }
             url = '/session/' + "POIDraft"+"/"+"false"
             $.ajax({
@@ -811,19 +811,10 @@ function poi_sound(format, ids) {
         },
     });
 }
-function delete_confirm(id, name, format){
-    var del = confirm("確定刪除?");
-    if (del == true && format != 8)
-        delete_img(id, name, format, del);
-    else if(del == true){
-        delete_sound(id,name, format,del);
-        chk_sound = 8;
-    }
 
-        
-}
-function delete_img(id, name, format, del) {
-    //var del = confirm("確定刪除?");
+
+function delete_img(id, name, format) {
+    del = confirm("確定刪除?");
     var urls = "/delete_media";
     var rmv = $('#edit_' + id);
     var data = {
@@ -831,7 +822,7 @@ function delete_img(id, name, format, del) {
         picture_name: name,
         format: format,
     }
-    if (del == true && image_count >1 && temp_flag == false || format == 2 || format == 4){
+    if (del){
         $('#loading').show();
         $.ajax({
             method: "POST",
@@ -877,42 +868,7 @@ function delete_img(id, name, format, del) {
     }
 }
 
-function delete_sound(id, name, format, del){
-    var urls = "/delete_media";
-    var rmv = $('#edit_' + id);
-    var data = {
-        picture_id: id,
-        picture_name: name,
-        format: format,
-    }
-    if (del == true && sound_count >= 1 ){
-        $('#loading').show();
-        $.ajax({
-            method: "POST",
-            url: urls,
-            data: data,
-            success: function(data) {
-                console.log(data);
-                if (data == 'success' && 　format == 8) {
-                    $('.alert-success').show();
-                    $('.alert-success').append('<p>語音導覽刪除成功!</p>');
-                    $('#loading').hide();
-                    rmv.remove();
-                    sound_count--;
-                } else {
-                    $('.alert-danger').show();
-                    $('.alert-danger').append('<p>多媒體刪除失敗!</p>');
-                }
 
-            },
-            error: function(data) {
-                console.log(data);
-                console.log("delete sound error");
-            }
-        });
-    }
-
-};
 
 
 function CheckStrIn(city, area, address) {

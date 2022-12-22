@@ -1619,7 +1619,10 @@ def make_player(request, ids=None, types=None):
                 del_loi = None
                 del_aoi = None
                 del_soi = None
-            delete_all_xoi_in_coi(ids, types)
+            all_del = models.CoiPoint.objects.filter(types=types, point_id=ids)
+            if all_del != None:
+                all_del.delete()
+
             if fromDraft:
                 HttpResponseRedirect('/poi_drafts')
             return HttpResponseRedirect('/make_player')
@@ -5872,12 +5875,6 @@ def add_user_to_coi(request):
         return HttpResponse("No user")
     AddCoiUser(user_info, coi)
     return HttpResponse("Success")
-
-
-def delete_all_xoi_in_coi(ids, types):
-    all_del = models.CoiPoint.objects.filter(types=types, point_id=ids)
-    if all_del != None:
-        all_del.delete()
 
 
 def AddCoiPoint(id, types, coi, verification=0):

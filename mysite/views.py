@@ -8124,103 +8124,7 @@ def manage_event(request, event_id, coi=''):  # event detail page
     except ObjectDoesNotExist:
         print('ObjectDoesNotExist')
         return HttpResponseRedirect(make_url)
-    try:
-        username = request.session['%susername' % (coi)]
-        role = request.session['%srole' % (coi)]
-        language = request.session['%slanguage' % (coi)]
-        nickname = request.session['%snickname' % (coi)]
-        pre_page = request.session['%spre_page' % (coi)]
-        is_leader = request.session['%sis_leader' % (coi)]
-        print(is_leader)
-    except:
-        pass
-
-    if coi == '':
-        try:
-            is_leader = request.session['is_leader']
-        except:
-            is_leader = ''
-    if coi != '':
-        template_url = '%s/manage_event.html' % (coi)
-        list_url = '/%s/list_event' % (coi)
-        make_url = '/%s/make_player' % (coi)
-    else:
-        template_url = 'manage_event.html'
-        list_url = '/list_events'
-        make_url = '/make_player'
-        coi = 'deh'
-    try:
-        event = models.Events.objects.get(Event_id=event_id, language=language)
-        member = models.EventsMember.objects.filter(event_id=event)
-        leader_id = event.Event_leader_id
-        leader_name = models.UserProfile.objects.get(user_id=leader_id)
-
-        if username != '':  # login user
-            user = models.UserProfile.objects.get(user_name=username)
-            user_id = user.user_id
-            #只有組頭能修改群組
-            if user_id == leader_id:
-                check_leader = True
-            else:
-                check_leader = False
-        else:  # user not login
-            user_id = 0
-       
-        ip = get_user_ip(request)
-        exploring_time = datetime.now()
-        page = 'http://deh.csie.ncku.edu.tw/manage_event/' + event_id
-        request.session['pre_page'] = 'http://deh.csie.ncku.edu.tw/list_events/'
-        obj = models.Logs(
-            user_id=user_id,
-            ip=ip,
-            dt=datetime.now(),
-            page=page,
-            ulatitude=0,
-            ulongitude=0,
-            pre_page = request.session['pre_page']
-        )
-        obj.save(force_insert=True)
-        request.session['pre_page'] = event_id
-        # models.Logs.objects.filter(page='http://deh.csie.ncku.edu.tw/aoi_detail/'+aoi_id | ).count()
-
-        if username == leader_name.user_name or role == 'admin':  # 檢查是否為leader
-            is_leader = True
-        else:
-            is_leader = False
-        try:  # 檢查是否為member
-            member_name = models.UserProfile.objects.get(user_name=username)
-            is_member = models.EventsMember.objects.filter(
-                user_id=member_name.user_id, event_id=event).exists()
-        except:
-            is_member = False
-
-        #*******************************************************************
-        
-        group = models.Groups.objects.filter(coi_name=coi)
-        # msg, user_id = GetNotification(username)  # Get invite notifications
-        # msg_count = msg.count()
-        try:
-            user = models.UserProfile.objects.get(user_name=username)
-            group_list = models.GroupsMember.objects.filter(user_id=user.user_id, foreignkey__in=group)
-            eventgroups = models.EventsGroup.objects.filter(event_id = event_id)
-            
-            for g in group_list:
-                g.checked = 'hello'
-                for eventgroup in eventgroups:                    
-                    if g.foreignkey.group_id == eventgroup.group_id.group_id:
-                        g.checked = 'checked'
-                        break
-        except:
-            group_list = None
-
-        #*******************************************************************
-
-        template = get_template(template_url)
-        html = template.render(locals())
-        return HttpResponse(html)
-    except ObjectDoesNotExist:
-        print('ObjectDoesNotExist')
-        return HttpResponseRedirect(make_url)
+    
 
 def Event_Authority(request):
     event_id = request.POST.get('event_id')
@@ -8485,37 +8389,7 @@ def ajax_event_invite(request, coi=''):  # 取得邀請列表/寄出邀請/回�
             kick_member = models.EventsMember.objects.filter(event_id=event_id, user_id=member_id)
             kick_member.delete()
             return HttpResponse('success')
-        # elif action == 'put_interest':  # 放Poi/Loi/Aoi/Soi進入群組(不能放多個群組)
-        #     group_id = request.POST.get('group_id')
-        #     types = request.POST.get('types')
-        #     point_id = request.POST.get('type_id')
-        #     group = models.Groups.objects.get(group_id=group_id)
-        #     try:
-        #         max_id = models.GroupsPoint.objects.all().aggregate(Max('id'))  # 取得最大id
-        #         ids = int(max_id['id__max']) + 1  # 最大id轉成整數+1
-        #     except:
-        #         ids = 0
-        #     if models.GroupsPoint.objects.filter(types=types, point_id=point_id, foreignkey=group).exists():
-        #         return HttpResponse('samepoint')
-        #     else:
-        #         interest = models.GroupsPoint(
-        #             id=ids,
-        #             foreignkey=group,
-        #             types=types,
-        #             point_id=point_id
-        #         )
-        #         AutoIncrementSqlSave(interest, "[dbo].[GroupsPoint]")
-        #         return HttpResponse('success')
-        # elif action == 'remove_interest':
-        #     group_id = request.POST.get('group_id')
-        #     types = request.POST.get('types')
-        #     point_id = request.POST.get('type_id')
-        #     group = models.Groups.objects.get(
-        #         group_id=group_id)  # 刪除群組內Poi/Loi/Aoi/Soi
-        #     interest = models.GroupsPoint.objects.get(
-        #         foreignkey=group, types=types, point_id=point_id)
-        #     interest.delete()
-        #     return HttpResponse('success')
+
         else:
             return HttpResponse(action)
     else:

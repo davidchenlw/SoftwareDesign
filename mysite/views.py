@@ -5747,17 +5747,7 @@ def get_verification_coi(request, coi): # sdc驗證者頁面
 
 
 
-def check_coi_point_verification(point_list, types, coi):
-    verify_check = True
-    for point in point_list:
-        try:
-            check_point = models.CoiPoint.objects.get(types=types, point_id=point, coi_name=coi)
-        except ObjectDoesNotExist:
-            return False
-        if check_point.verification == -1:
-            verify_check = False
-            break
-    return verify_check
+
 
 
 def get_user_all_coi(user_id):

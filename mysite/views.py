@@ -3778,7 +3778,7 @@ def ajax_verification(request, coi=''):
             all_xoi = all_xoi.filter(identifier=role, language=language)
         if area == 'all':
             all_soi = all_xoi.filter(identifier=role, verification=int(
-                ver_item), language=language, area_name_en__in=all_city)
+                ver_item), language=language)
         else:
             all_soi = all_xoi.filter(identifier=role, verification=int(
                 ver_item), area_name_en=area, language=language)
@@ -5565,6 +5565,107 @@ def delete_xoi_coi(request, coi, ids, types):
             pass
     return HttpResponse('0')
 
+def verification_xoi_coi(request):
+    coi = request.POST.get('coi')
+    types = request.POST.get('types')
+    point_id = request.POST.get('id')
+    feedback_mes = request.POST.get('feedback_mes')
+    verification = int(request.POST.get('verification'))
+    language = request.session['%slanguage' % (coi)]
+
+    
+    if types == 'group':
+        try:
+            coi_group = models.Groups.objects.get(group_id=point_id)
+        except ObjectDoesNotExist:
+            return HttpResponse('Group not found')
+        coi_group.verification = verification
+        coi_group.save()
+        return HttpResponse("Success")
+    verify_check = True
+    try:
+        coi_point = models.CoiPoint.objects.get(
+            types=types, point_id=point_id, coi_name=coi)
+    except ObjectDoesNotExist:
+        AddCoiPoint(point_id, types, coi)
+        coi_point = models.CoiPoint.objects.get(
+            types=types, point_id=point_id, coi_name=coi)
+    tableName = ""
+
+    if types == 'poi':
+        edit_poi = models.Dublincore.objects.get(poi_id=point_id, language=language) # 兩個資料表皆存有 verification 狀態
+        poi_profile = models.UserProfile.objects.get(user_name=edit_poi.rights)
+        edit_poi.verification = int(verification)
+        edit_poi.open = True
+        edit_poi.save()
+    elif types == 'loi':
+        if verification == 1:
+            loi_poi = models.Sequence.objects.filter(foreignkey=point_id)
+            for l in loi_poi:
+                try:
+                    check_point = models.CoiPoint.objects.get(types=types, point_id=l, coi_name=coi)
+                except ObjectDoesNotExist:
+                    verify_check = False
+                if check_point.verification == -1:
+                    verify_check = False
+                    break
+    elif types == 'aoi':
+        if verification == 1:
+            aoi_poi = models.AoiPois.objects.filter(aoi_id_fk=point_id).values_list('poi_id', flat=True)
+            for a in aoi_poi:
+                try:
+                    check_point = models.CoiPoint.objects.get(types=types, point_id=a, coi_name=coi)
+                except ObjectDoesNotExist:
+                    verify_check = False
+                if check_point.verification == -1:
+                    verify_check = False
+                    break
+    elif types == 'soi':
+        if verification == 1:
+            soi_poi = models.SoiStoryXoi.objects.filter(soi_id_fk=point_id, loi_id=0, aoi_id=0).values_list('poi_id', flat=True)
+            for p in soi_poi:
+                try:
+                    check_point = models.CoiPoint.objects.get(types=types, point_id=s, coi_name=coi)
+                except ObjectDoesNotExist:
+                    verify_check = False
+                if check_point.verification == -1:
+                    verify_check = False
+                    break
+            if verify_check == True:
+                soi_loi = models.SoiStoryXoi.objects.filter(soi_id_fk=point_id, poi_id=0, aoi_id=0).values_list('loi_id', flat=True)
+                for l in soi_loi:
+                    try:
+                        check_point = models.CoiPoint.objects.get(types=types, point_id=l, coi_name=coi)
+                    except ObjectDoesNotExist:
+                        verify_check = False
+                    if check_point.verification == -1:
+                        verify_check = False
+                        break
+            if verify_check == True:
+                soi_aoi = models.SoiStoryXoi.objects.filter(soi_id_fk=point_id, poi_id=0, loi_id=0).values_list('aoi_id', flat=True)
+                for a in soi_aoi:
+                    try:
+                        check_point = models.CoiPoint.objects.get(types=types, point_id=a, coi_name=coi)
+                    except ObjectDoesNotExist:
+                        verify_check = False
+                    if check_point.verification == -1:
+                        verify_check = False
+                        break
+    
+    if verification == 1 and verify_check == False:
+        return HttpResponse("Fail")
+    else:
+        coi_point.verification = verification
+        if feedback_mes:
+            coi_point.feedback_mes = feedback_mes
+        else:
+            coi_point.feedback_mes = "驗證通過"
+            
+
+        coi_point.save()
+
+    return HttpResponse("Success")
+
 
 def get_verification_coi(request, coi): # sdc驗證者頁面
     ver_item = request.POST.get('ver_item')
@@ -5600,20 +5701,15 @@ def get_verification_coi(request, coi): # sdc驗證者頁面
         }
         return JsonResponse(data)
     all_xoi = FilterCoiPoint(content, coi, int(ver_item))
-    #print(all_xoi.count())
-    
-    #print(all_xoi.count())
-    if area == '全部':
-        all_xoi = all_xoi.filter(area_name_en__in=all_city)
-    else:
+
+    if area != '全部':
         all_xoi = all_xoi.filter(area_name_en=area)
     if content == 'poi':
         if user_role != 'admin' and user_role != 'identifier':
             all_xoi = all_xoi.filter(poi_id__in = Group_xois, identifier=role, language=language)
         else:
             all_xoi = all_xoi.filter(identifier=role, language=language)
-        values_list = list(all_xoi.values(
-            'poi_id', 'poi_title', 'identifier', 'rights'))
+        values_list = list(all_xoi.values('poi_id', 'poi_title', 'identifier', 'rights'))
         data = {"all_poi": values_list}
         return JsonResponse(data)
     elif content == 'loi':
@@ -5648,89 +5744,14 @@ def get_verification_coi(request, coi): # sdc驗證者頁面
         return JsonResponse(data)
 
 
-def verification_xoi_coi(request):
-    coi = request.POST.get('coi')
-    types = request.POST.get('types')
-    point_id = request.POST.get('id')
-    feedback_mes = request.POST.get('feedback_mes')
-    verification = int(request.POST.get('verification'))
-    language = request.session['%slanguage' % (coi)]
 
-    
-    if types == 'group':
-        try:
-            coi_group = models.Groups.objects.get(group_id=point_id)
-        except ObjectDoesNotExist:
-            return HttpResponse('Group not found')
-        coi_group.verification = verification
-        coi_group.save()
-        return HttpResponse("Success")
-    verify_check = True
-    try:
-        coi_point = models.CoiPoint.objects.get(
-            types=types, point_id=point_id, coi_name=coi)
-    except ObjectDoesNotExist:
-        AddCoiPoint(point_id, types, coi)
-        coi_point = models.CoiPoint.objects.get(
-            types=types, point_id=point_id, coi_name=coi)
-    tableName = ""
-
-    if types == 'poi':
-        edit_poi = models.Dublincore.objects.get(poi_id=point_id, language=language) # 兩個資料表皆存有 verification 狀態
-        poi_profile = models.UserProfile.objects.get(user_name=edit_poi.rights)
-        mail_address = poi_profile.email
-        mail_name = edit_poi.poi_title
-        edit_poi.verification = int(verification)
-        edit_poi.open = True
-        edit_poi.save()
-    if types == 'loi':
-        tableName
-        if verification == 1:
-            loi_poi = models.Sequence.objects.filter(
-                foreignkey=point_id).values_list('poi_id', flat=True)
-            verify_check = check_coi_point_verification(loi_poi, 'poi', coi)
-    elif types == 'aoi':
-        if verification == 1:
-            aoi_poi = models.AoiPois.objects.filter(
-                aoi_id_fk=point_id).values_list('poi_id', flat=True)
-            verify_check = check_coi_point_verification(aoi_poi, 'poi', coi)
-    elif types == 'soi':
-        if verification == 1:
-            soi_poi = models.SoiStoryXoi.objects.filter(
-                soi_id_fk=point_id, loi_id=0, aoi_id=0).values_list('poi_id', flat=True)
-            verify_check = check_coi_point_verification(soi_poi, 'poi', coi)
-            if verify_check == True:
-                soi_loi = models.SoiStoryXoi.objects.filter(
-                    soi_id_fk=point_id, poi_id=0, aoi_id=0).values_list('loi_id', flat=True)
-                verify_check = check_coi_point_verification(
-                    soi_poi, 'loi', coi)
-            if verify_check == True:
-                soi_aoi = models.SoiStoryXoi.objects.filter(
-                    soi_id_fk=point_id, poi_id=0, loi_id=0).values_list('aoi_id', flat=True)
-                verify_check = check_coi_point_verification(
-                    soi_poi, 'aoi', coi)
-    
-    if verification == 1 and verify_check == False:
-        return HttpResponse("Fail")
-    else:
-        coi_point.verification = verification
-        if feedback_mes:
-            coi_point.feedback_mes = feedback_mes
-        else:
-            coi_point.feedback_mes = "驗證通過"
-            
-
-        coi_point.save()
-
-    return HttpResponse("Success")
 
 
 def check_coi_point_verification(point_list, types, coi):
     verify_check = True
     for point in point_list:
         try:
-            check_point = models.CoiPoint.objects.get(
-                types=types, point_id=point, coi_name=coi)
+            check_point = models.CoiPoint.objects.get(types=types, point_id=point, coi_name=coi)
         except ObjectDoesNotExist:
             return False
         if check_point.verification == -1:

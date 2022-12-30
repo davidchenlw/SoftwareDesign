@@ -2,6 +2,9 @@ image_count = 0; //多媒體
 sound_count = 0; //語音導覽
 finalFiles = []; //多媒體檔案(圖)
 var is_edit = false;
+var map;
+
+
 $(window).on('beforeunload', function () {
     localStorage.setItem('poi_title', $('#poi_title').val());
     //localStorage.setItem('poi_subject', $('#subject').val());
@@ -17,6 +20,8 @@ $(window).on('beforeunload', function () {
     localStorage.setItem('poi_format', $('#format').val());
     //localStorage.setItem('poi_source', $('#poi_source').val());
 });
+
+
 
 window.onload = function () {
     var title = localStorage.getItem('poi_title');
@@ -47,6 +52,7 @@ window.onload = function () {
     if (source != null) $('#poi_source').val(source);*/
 }
 $(document).ready(function () {
+    map()
     $('#poi_msg').modal('show');
     $('.upload_nothing').append('<input class="sound_val" name="sounds" value="0" hidden>');
     if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -305,58 +311,62 @@ function rmvImg(element, name) {
     image_count--;
 }
 
-// Create a Platform object:
-var platform = new H.service.Platform({
-    'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
-});
-
-// Get an object containing the default map layers:
-var defaultLayers = platform.createDefaultLayers({lg:'cht'});
-
-// Instantiate the map using the vecor map with the
-// default style as the base layer:
-var map = new H.Map(
-    document.getElementById('map_poi'),
-    defaultLayers.raster.normal.map, {
-        zoom: 8,
-        center: { lat: 23.5, lng: 121.120850 },
-        pixelRatio: window.devicePixelRatio || 1
+function map(){
+    // Create a Platform object:
+    var platform = new H.service.Platform({
+        'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
     });
 
-// Enable the event system on the map instance:
-var mapEvents = new H.mapevents.MapEvents(map);
+    // Get an object containing the default map layers:
+    var defaultLayers = platform.createDefaultLayers({lg:'cht'});
 
-
-// Instantiate the default behavior, providing the mapEvents object: 
-var behavior = new H.mapevents.Behavior(mapEvents);
-
-// Create the default UI:
-var ui = H.ui.UI.createDefault(map, defaultLayers, 'zh-CN')
-
-
-
-// Add event listener:
-map.addEventListener('tap', function(evt) {
-    var coord = map.screenToGeo(evt.currentPointer.viewportX,evt.currentPointer.viewportY);
-    //console.log(evt.type, coord);
-    document.getElementById("latitude").value = coord.lat;
-    document.getElementById("longitude").value = coord.lng;
-    //$('#latitude').val(coord.lat);
-    //$('#longitude').val(coord.lng);
-    var service = platform.getSearchService();
-    
-    service.reverseGeocode({
-        at: coord.lat+','+coord.lng
-        }, (result) => {
-        result.items.forEach((item) => {
-            document.getElementById("poi_address").value = item.address.label;
-            placeMarker(item.position);
-            /*ui.addBubble(new H.ui.InfoBubble(item.position, {
-            content: item.address.label
-            }));*/
+    // Instantiate the map using the vecor map with the
+    // default style as the base layer:
+    map = new H.Map(
+        document.getElementById('map_poi'),
+        defaultLayers.raster.normal.map, {
+            zoom: 8,
+            center: { lat: 23.5, lng: 121.120850 },
+            pixelRatio: window.devicePixelRatio || 1
         });
-    },alert);
-});
+
+    // Enable the event system on the map instance:
+    var mapEvents = new H.mapevents.MapEvents(map);
+
+
+    // Instantiate the default behavior, providing the mapEvents object: 
+    var behavior = new H.mapevents.Behavior(mapEvents);
+
+    // Create the default UI:
+    var ui = H.ui.UI.createDefault(map, defaultLayers, 'zh-CN')
+
+    // Add event listener:
+    map.addEventListener('tap', function(evt) {
+        var coord = map.screenToGeo(evt.currentPointer.viewportX,evt.currentPointer.viewportY);
+        //console.log(evt.type, coord);
+        document.getElementById("latitude").value = coord.lat;
+        document.getElementById("longitude").value = coord.lng;
+        //$('#latitude').val(coord.lat);
+        //$('#longitude').val(coord.lng);
+        var service = platform.getSearchService();
+        
+        service.reverseGeocode({
+            at: coord.lat+','+coord.lng
+            }, (result) => {
+            result.items.forEach((item) => {
+                document.getElementById("poi_address").value = item.address.label;
+                placeMarker(item.position);
+                /*ui.addBubble(new H.ui.InfoBubble(item.position, {
+                content: item.address.label
+                }));*/
+            });
+        },alert);
+    });
+}
+
+
+
+
 
 function placeMarker(location) {
     map.removeObjects(map.getObjects());
@@ -706,6 +716,8 @@ function SubmitForm(event) {
 }
 
 $('#city').change(function () {
+
+    console.log("where are we now?")
     var city = $(this).val();
     var urls = "/feed_area";
     var data = {

@@ -1378,14 +1378,19 @@ def make_player(request, ids=None, types=None):
         if "POIDraft" in request.session:
             fromDraft = request.session["POIDraft"]=="true"
 
+
+        #全部poi
         all_poi = models.Dublincore.objects.filter(
             rights=username, language=language,is_draft= False)
 
-        temp_loi = models.RoutePlanning.objects.filter(
-            route_owner=username, language=language,is_draft= False)
+        #全部loi
+        temp_loi = models.RoutePlanning.objects.filter(route_owner=username, language=language,is_draft= False)
+
+        #全部aoi
         temp_aoi = models.Aoi.objects.filter(owner=username, language=language,is_draft= False)
-        temp_soi = models.SoiStory.objects.filter(
-            soi_user_name=username, language=language,is_draft= False)
+
+        #全部soi
+        temp_soi = models.SoiStory.objects.filter( soi_user_name=username, language=language,is_draft= False)
         user = models.UserProfile.objects.get(user_name=username)
         group = models.Groups.objects.filter(language=language)  # 是否要分語言(?)   
         count_nn = 0   
@@ -1394,27 +1399,42 @@ def make_player(request, ids=None, types=None):
         export_poi_list = list(all_poi.values('poi_id', 'poi_title', 'subject', 'area_name_en', 'type1', 'period', 'year', 
         'keyword1', 'keyword2', 'keyword3', 'keyword4', 'poi_address', 'latitude', 'longitude',
         'poi_description_1', 'format', 'poi_source', 'creator', 'publisher', 'contributor', 'open', 'language'))
+        media = models.Mpeg.objects.filter(foreignkey__in = all_poi.values('poi_id') ,format__in = [1,2,4])
+        media_dict = dict()
+
+        #<p_id,<format,mpeg list>>
+        for a in media:
+            if not a.foreignkey.poi_id in media_dict.keys():
+                media_dict[a.foreignkey.poi_id]=dict()
+            if not a.format in media_dict[a.foreignkey.poi_id].keys():
+                media_dict[a.foreignkey.poi_id][a.format]=[]
+            media_dict[a.foreignkey.poi_id][a.format].append(a)
+
         for poi in export_poi_list:
             # print(poi)
-            Pictures = models.Mpeg.objects.filter(foreignkey=poi['poi_id'],format=1) 
-            Audio = models.Mpeg.objects.filter(foreignkey=poi['poi_id'],format=2)
-            Video = models.Mpeg.objects.filter(foreignkey=poi['poi_id'],format=4) 
-            index = 1
-            for p in Pictures:
-                #print('picture url:',p.picture_url)
-                poi['picture'+str(index)] = p.picture_url
-                index += 1
-            for a in Audio:
-                poi['audio'] = a.picture_url
-                #print('audio url:',a.picture_url)
-            for v in Video:
-                poi['video'] = v.picture_url
-                #print('video url:',v.picture_url)
+
+            if poi['poi_id'] in media_dict.keys() and  1 in media_dict[poi['poi_id']].keys():
+                index = 1
+                Pictures = media_dict[poi['poi_id']][1]#dict[id][1]## models.Mpeg.objects.filter(foreignkey=poi['poi_id'],format=1) 
+                for p in Pictures:
+                    poi['picture'+str(index)] = p.picture_url
+                    index += 1
+
+            if poi['poi_id'] in media_dict.keys() and  2 in media_dict[poi['poi_id']].keys():
+                Audio = media_dict[poi['poi_id']][2]#models.Mpeg.objects.filter(foreignkey=poi['poi_id'],format=2)
+                for a in Audio:
+                    poi['audio'] = a.picture_url
+            if poi['poi_id'] in media_dict.keys() and 4  in media_dict[poi['poi_id']].keys():
+                Video = media_dict[poi['poi_id']][4]#models.Mpeg.objects.filter(foreignkey=poi['poi_id'],format=4) 
+                for v in Video:
+                    poi['video'] = v.picture_url
         ###匯出檔案專用###  
         try:
-            values = models.Mpeg.objects.filter(
-                foreignkey__in=all_poi).values('foreignkey')
+            values = models.Mpeg.objects.filter(foreignkey__in=all_poi).values('foreignkey')
+
+            #無多媒體檔案的poi
             no_mpeg_temp = all_poi.exclude(poi_id__in=values)
+            #有多媒體檔案的poi
             poi_list = all_poi.filter(poi_id__in=values)       
             poi = [] 
             tmpPOIFeedbackList = models.CoiPoint.objects.filter(types = 'poi', coi_name = 'deh')
@@ -1423,11 +1443,14 @@ def make_player(request, ids=None, types=None):
                 if tmpPOIFeedbackDict.get(tmp.point_id,None)==None:
                     tmpPOIFeedbackDict[tmp.point_id] = []
                 tmpPOIFeedbackDict[tmp.point_id].append(tmp)
+            
+
                 
             for p in list(poi_list.values('poi_id', 'poi_title', 'open', 'verification')):
                 count_nn+= 1
                 p['format'] = min(models.Mpeg.objects.filter(foreignkey=p['poi_id']).values_list('format', flat=True))
                 feedbacks = tmpPOIFeedbackDict.get(p['poi_id'] ,None)
+
                 if feedbacks==None:
                     trace_back = traceback.format_exc()
                     AddCoiPoint(p['poi_id'], "poi", "deh",p['verification'])
@@ -1455,9 +1478,8 @@ def make_player(request, ids=None, types=None):
             print("no data")
             print(e)
 
-
         no_mpeg = []  
-        
+  
         for temp in list(no_mpeg_temp.values('poi_id', 'poi_title', 'open', 'verification')):
             feedbacks = tmpPOIFeedbackDict.get(temp['poi_id'] ,None)
             if feedbacks==None:
@@ -1513,6 +1535,7 @@ def make_player(request, ids=None, types=None):
             loi.append(temp)
             loi_list.append(temp['route_id'])
 
+
         aoi = []
         aoi_list = []
         for temp in list(temp_aoi.values('aoi_id', 'title','area_name_en','description','contributor','transportation','owner','language', 'open', 'verification')):
@@ -1527,6 +1550,7 @@ def make_player(request, ids=None, types=None):
                 print("資料已存在")
             aoi.append(temp)
             aoi_list.append(temp['aoi_id'])
+
 
         soi = []
         soi_id_list = []
@@ -1560,11 +1584,13 @@ def make_player(request, ids=None, types=None):
                 user_id=user, foreignkey__in=group)
         except:
             group_list = None
-        
+
+        #刪除poi,loi,aoi,soi
         if ids and types:
           
             try:
                 if types == 'poi':
+
                     del_poi = models.Dublincore.objects.get(poi_id=ids)
                     mpeg = models.Mpeg.objects.filter(foreignkey=del_poi)
                 elif types == 'loi':
@@ -1623,6 +1649,7 @@ def make_player(request, ids=None, types=None):
             if all_del != None:
                 all_del.delete()
 
+
             if fromDraft:
                 HttpResponseRedirect('/poi_drafts')
             return HttpResponseRedirect('/make_player')
@@ -1633,6 +1660,16 @@ def make_player(request, ids=None, types=None):
             template = get_template('drafts_poi.html')
             html = template.render(locals())
             return HttpResponse(html)
+
+
+        # poi = [] 
+        # no_mpeg = []  
+        # loi = []
+        # loi_list = []
+        # aoi = []
+        # aoi_list = []
+        # soi = []
+        # soi_id_list = []        
 
         template = get_template('make_player.html')
         

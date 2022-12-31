@@ -5938,39 +5938,7 @@ def AddCoiUser(user, coi):
         AutoIncrementSqlSave(obj, "[dbo].[CoiUser]")
 
 
-def FilterCoiPoint(types, coi, verification=100):
-    if coi != '':
-        if verification != 100:
-            point_list = models.CoiPoint.objects.filter(
-                types=types, coi_name=coi, verification=verification).values_list('point_id', flat=True)
-        else:
-            point_list = models.CoiPoint.objects.filter(
-                types=types, coi_name=coi).values_list('point_id', flat=True)
-        
 
-        if types == "poi":
-            result_list = models.Dublincore.objects.filter(
-                poi_id__in=point_list)
-        elif types == "loi":
-            result_list = models.RoutePlanning.objects.filter(
-                route_id__in=point_list)
-        elif types == "aoi":
-            result_list = models.Aoi.objects.filter(aoi_id__in=point_list)
-        elif types == "soi":
-            result_list = models.SoiStory.objects.filter(soi_id__in=point_list)
-    else:
-        if types == "poi":
-            result_list = models.Dublincore.objects.all()
-        elif types == "loi":
-            result_list = models.RoutePlanning.objects.all()
-        elif types == "aoi":
-            result_list = models.Aoi.objects.all()
-        elif types == "soi":
-            result_list = models.SoiStory.objects.all()
-        if verification != 100:
-            result_list = result_list.filter(
-                ~Q(verification=0) & ~Q(verification=-1))
-    return result_list
 
 
 def check_coi_point(point_list, types, coi):

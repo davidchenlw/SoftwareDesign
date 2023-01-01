@@ -1,13 +1,52 @@
-let webMap, mobileMap;
-let map = {
-    web: webMap,
-    mobile: mobileMap
-};
+var web_map;
+var mobile_map;
 let markers = {
     web: [],
     mobile: [],
     point: [],
 };
+var platform = new H.service.Platform({
+    'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
+    });
+var defaultLayers = platform.createDefaultLayers({lg:'cht'});
+
+$("a[data-toggle='tab'][href='#web_history']").on('shown.bs.tab', function(e){
+
+    if(web_map == null)
+    {
+        web_map = new H.Map(
+            document.getElementById('web-history-map'),
+            defaultLayers.raster.normal.map, {
+                zoom: 8,
+                center: { lat: 23.5, lng: 121.120850 },
+                pixelRatio: window.devicePixelRatio || 1
+            });
+        var web_mapEvents = new H.mapevents.MapEvents(web_map);
+        var web_behavior = new H.mapevents.Behavior(web_mapEvents);
+        var web_ui = H.ui.UI.createDefault(web_map, defaultLayers, 'zh-CN')
+    }
+    
+})
+
+$("a[data-toggle='tab'][href='#mobile_history']").on('shown.bs.tab', function(e){
+    
+    if(mobile_map == null)
+    {
+        mobile_map = new H.Map(
+            document.getElementById('mobile-history-map'),
+            defaultLayers.raster.normal.map, {
+                zoom: 8,
+                center: { lat: 23.5, lng: 121.120850 },
+                pixelRatio: window.devicePixelRatio || 1
+            });
+        var mobile_mapEvents = new H.mapevents.MapEvents(mobile_map);
+        var mobile_behavior = new H.mapevents.Behavior(mobile_mapEvents);
+        var mobile_ui = H.ui.UI.createDefault(mobile_map, defaultLayers, 'zh-CN')
+    }
+    
+})
+
+
 
 $(document).ready(function () {
     $('#web_search').bind('click', () => hisSearch('web'));
@@ -42,20 +81,10 @@ function initTime() {
     $('#mstart_date').val(today);
     $('#mstart_time').val(time);
 
-    initMap();
+
 }
 
-function initMap() {
-    let webMapCanvas = document.getElementById('web-history-map');
-    let mobileMapCanvas = document.getElementById('mobile-history-map');
-    let myLatLng = new google.maps.LatLng(23.5, 121.120850)
-    let mapOptions = {
-        center: myLatLng,
-        zoom: 8
-    }
-    map['web'] = new google.maps.Map(webMapCanvas, mapOptions);
-    map['mobile'] = new google.maps.Map(mobileMapCanvas, mapOptions);
-}
+
 
 function hisSearch(type) {
     let contentType = $('#' + type + '_contents').val();
@@ -182,17 +211,6 @@ function dataAppend(data, platform, type) {
     setMapMarker(pointArray, 'point');
 }
 
-// function changePointMarker(index, obj) {
-//     if (obj.value === undefined) {
-//         obj.value = 1;
-//     }
-//     if (obj.value == 1) {
-//         addMapMarker(markers['point'][index], map['mobile'])
-//     } else {
-//         addMapMarker(markers['point'][index], null)
-//     }
-//     obj.value = -1 * obj.value;
-// }
 
 function setMapCenter(index, mapType) {
     map[mapType].setCenter(markers[mapType][index].position);

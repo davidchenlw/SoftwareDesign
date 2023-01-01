@@ -8,33 +8,7 @@ var map_markers = new Array();
 
 items = document.querySelectorAll('.test');
 
-//Create a Here Map
-// Create a Platform object:
-var platform = new H.service.Platform({
-    'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
-});
 
-// Get an object containing the default map layers:
-var defaultLayers = platform.createDefaultLayers({lg:'cht'});
-
-// Instantiate the map using the vecor map with the
-// default style as the base layer:
-var map2 = new H.Map(
-    document.getElementById('map_loi'),
-    defaultLayers.raster.normal.map, {
-        zoom: 7,
-        center: { lat: 23.5, lng: 121.120850 }
-    });
-
-// Enable the event system on the map instance:
-var mapEvents = new H.mapevents.MapEvents(map2);
-
-
-// Instantiate the default behavior, providing the mapEvents object: 
-var behavior = new H.mapevents.Behavior(mapEvents);
-
-// Create the default UI:
-var ui = H.ui.UI.createDefault(map2, defaultLayers, 'zh-CN')
 
 $(window).on('beforeunload', function() {
     localStorage.setItem('loi_title', $('#route_title').val());
@@ -54,6 +28,7 @@ window.onload = function() {
 
 
 $(document).ready(function() {
+    mymap()
     $('#make_loiform').submit(function(e) {
         $('#loading').show();
         e.preventDefault();
@@ -94,7 +69,36 @@ $(document).ready(function() {
 });
 
 
+function mymap()
+{
+    //Create a Here Map
+    // Create a Platform object:
+    var platform = new H.service.Platform({
+        'apikey': 'KltNt3WCaOrzMwVN4GmggfYufT5-vA3E7Xx3Ocq2ASg'
+    });
 
+    // Get an object containing the default map layers:
+    var defaultLayers = platform.createDefaultLayers({lg:'cht'});
+
+    // Instantiate the map using the vecor map with the
+    // default style as the base layer:
+    var map2 = new H.Map(
+        document.getElementById('map_loi'),
+        defaultLayers.raster.normal.map, {
+            zoom: 7,
+            center: { lat: 23.5, lng: 121.120850 }
+        });
+
+    // Enable the event system on the map instance:
+    var mapEvents = new H.mapevents.MapEvents(map2);
+
+
+    // Instantiate the default behavior, providing the mapEvents object: 
+    var behavior = new H.mapevents.Behavior(mapEvents);
+
+    // Create the default UI:
+    var ui = H.ui.UI.createDefault(map2, defaultLayers, 'zh-CN')
+}
 
 
 function Choosen_loi(i) { //列出poi list
